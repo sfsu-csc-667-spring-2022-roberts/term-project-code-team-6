@@ -1,7 +1,7 @@
 :root {
-  --bg-color: #a82724;
+	--primary-color: #a82724;
+	--secondary-color: #ffd803;
 }
-
 
 html,
 body {
@@ -10,16 +10,23 @@ body {
 	font-size: 100%;
 	font: inherit;
 	vertical-align: baseline;
-  width: 100vw;
-  height: 100vh;
+	width: 100vw;
+	height: 100vh;
 }
 
-ol, ul {
+ol,
+ul {
 	list-style: none;
 }
 
+button {
+	border: none;
+	cursor: pointer;
+	border-radius: 3px;
+}
+
 body {
-  font-family: "Poppins"
+	font-family: 'Poppins';
 }
 
 a {
@@ -27,19 +34,79 @@ a {
 	text-decoration: none;
 }
 
+/* UI components */
+.secondary-btn {
+	padding: 1rem;
+	background-color: var(--secondary-color);
+	color: white;
+	font-size: 1.2rem;
+}
+
+.content {
+	min-height: 80%;
+	padding: 2rem;
+}
+
 .nav {
-  background-color: var(--bg-color);
-  display: flex;
-  justify-content: space-between;
-  padding: 2rem;
-  color: white;
+	background-color: var(--primary-color);
+	display: flex;
+	justify-content: space-between;
+	padding: 2rem;
+	color: white;
 }
 
 .nav-brand {
-  font-weight: 700;
+	font-weight: 700;
 }
 
 .nav-right {
-  display: flex;
-  gap: 1rem;
+	display: flex;
+	gap: 1rem;
+}
+
+/* Footer */
+.footer {
+	padding: 2rem;
+	background-color: var(--primary-color);
+	color: white;
+}
+
+/* Landing Page */
+.landing {
+	height: 100%;
+	display: flex;
+}
+
+.landing_game-room {
+	flex: 3;
+	height: 100%;
+	margin-right: 1rem;
+}
+
+.landing_list-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	/* background-color: var(--primary-color); */
+	padding: 1rem;
+	/* color: white; */
+	border: 1px solid gray;
+	border-radius: 3px;
+	margin-bottom: 1rem;
+}
+
+.landing_list-item_left {
+	display: flex;
+	gap: 2rem;
+}
+
+.landing_list-item button {
+	/* border-radius: 0.6rem; */
+}
+
+.landing_chat {
+	flex: 1;
+	min-height: 80vh;
+	border: 1px solid gray;
+	border-radius: 3px;
 }
