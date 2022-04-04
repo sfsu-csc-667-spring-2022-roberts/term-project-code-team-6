@@ -1,0 +1,16 @@
+<nav class='nav'>
+	<div class='nav-brand'>
+		<a href='/'>UNO</a>
+	</div>
+	<div class='nav-right'>
+		<div>
+			<a href='/how-to-play'>how to play ?</a>
+		</div>
+		{{#if logged}}
+			<a id='nav-logout-btn'>Log out</a>
+		{{else}}
+			<div id='nav-login-btn'><a href='/login' id='nav-login'>Login</a></div>
+			<div id='nav-SignUp-btn'><a href='/registration' id='nav-SignUp'>Sign up</a></div>
+		{{/if}}
+	</div>
+</nav>

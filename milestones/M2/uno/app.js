@@ -1,18 +1,20 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const hbs = require('hbs');
+const logger = require('morgan');
 if (process.env.NODE_ENV === 'development') {
 	require('dotenv').config();
 }
 
-var indexRouter = require('./routes/index');
-var testsRouter = require('./routes/tests');
+const indexRouter = require('./routes/index');
+const testsRouter = require('./routes/tests');
 
-var app = express();
+const app = express();
 
 // view engine setup
+hbs.registerPartials(path.join(__dirname, 'views/partials'));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
