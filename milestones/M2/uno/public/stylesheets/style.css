@@ -1,6 +1,7 @@
 :root {
 	--primary-color: #a82724;
 	--secondary-color: #ffd803;
+	--cancel-color: rgb(192, 188, 188);
 }
 
 html,
@@ -19,6 +20,7 @@ ul {
 	list-style: none;
 }
 
+a,
 button {
 	border: none;
 	cursor: pointer;
@@ -35,15 +37,28 @@ a {
 }
 
 /* UI components */
+.primary-btn {
+	padding: 1rem 2rem;
+	background-color: var(--primary-color);
+	color: white;
+	font-size: 1.1rem;
+}
+
 .secondary-btn {
-	padding: 1rem;
+	padding: 1rem 2rem;
 	background-color: var(--secondary-color);
 	color: white;
-	font-size: 1.2rem;
+	font-size: 1.1rem;
+}
+
+.cancel-btn {
+	padding: 1rem 2rem;
+	background-color: var(--cancel-color);
+	font-size: 1.1rem;
 }
 
 .content {
-	min-height: 80%;
+	min-height: 100%;
 	padding: 2rem;
 }
 
@@ -51,7 +66,7 @@ a {
 	background-color: var(--primary-color);
 	display: flex;
 	justify-content: space-between;
-	padding: 2rem;
+	padding: 2rem 6rem;
 	color: white;
 }
 
@@ -66,7 +81,7 @@ a {
 
 /* Footer */
 .footer {
-	padding: 2rem;
+	padding: 2rem 6rem;
 	background-color: var(--primary-color);
 	color: white;
 }
@@ -79,8 +94,9 @@ a {
 
 .landing_game-room {
 	flex: 3;
-	height: 100%;
+	height: 70vh;
 	margin-right: 1rem;
+  overflow-y: scroll;
 }
 
 .landing_list-item {
@@ -104,9 +120,98 @@ a {
 	/* border-radius: 0.6rem; */
 }
 
-.landing_chat {
+.chat {
 	flex: 1;
-	min-height: 80vh;
+	height: 70vh;
 	border: 1px solid gray;
 	border-radius: 3px;
+	display: flex;
+	flex-direction: column;
+}
+
+.chat-msg {
+	flex: 1;
+	padding: 1rem;
+}
+
+.chat-container {
+	margin-bottom: 1rem;
+}
+
+.chat-input {
+	width: 100%;
+	height: 150px;
+	padding: 12px 20px;
+	box-sizing: border-box;
+	background-color: #f8f8f8;
+	font-size: 16px;
+	border: none;
+	border-top: 1px solid black;
+	resize: none;
+}
+
+/* Game */
+.game {
+	display: flex;
+}
+
+.game-room {
+	flex: 3;
+	border: 1px solid gray;
+	margin-right: 1rem;
+}
+
+.auth-container {
+	display: flex;
+	justify-content: center;
+}
+
+.auth-form {
+	width: 300px;
+	padding: 1rem 4rem 3rem 4rem;
+	border-radius: 8px;
+	/* background-color: var(--primary-color); */
+	/* color: white; */
+	border: 1px solid rgb(175, 175, 175);
+}
+
+.auth-form_input label {
+	display: block;
+}
+
+.auth-form_input input {
+	width: 100%;
+	font-size: 1.2rem;
+}
+
+.auth-form_input {
+	margin-bottom: 1.5rem;
+	font-size: 1.2rem;
+}
+
+.auth_button-group {
+	display: flex;
+	flex-direction: row-reverse;
+	gap: 1rem;
+}
+
+.has-account {
+	display: block;
+	margin-bottom: 2rem;
+}
+
+.has-account:hover {
+	text-decoration: underline;
+	cursor: pointer;
+	color: var(--cancel-color);
+}
+
+.auth-from_tnc {
+	margin-bottom: 2rem;
+}
+
+.auth-from_tnc a:hover {
+	text-decoration: underline;
+	cursor: pointer;
+	color: var(--cancel-color);
 }
