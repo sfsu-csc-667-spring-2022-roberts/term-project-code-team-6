@@ -96,7 +96,7 @@ a {
 	flex: 3;
 	height: 70vh;
 	margin-right: 1rem;
-  overflow-y: scroll;
+  	overflow-y: scroll;
 }
 
 .landing_list-item {
