@@ -1,4 +1,4 @@
-.card{
+.card {
 	border-radius: 15px;
 	width: 80px;
 	height: 126px;
@@ -6,28 +6,311 @@
 	position: relative;
 }
 
-.backcard{
+.backcard {
 	background-position-x: 0;
 	background-position-y: 0;
 }
-.yellow{
+
+/****************************************************************
+* YELLOW CARDS
+****************************************************************/
+
+.yellow-1 {
 	background-position-x: -1px;
 	background-position-y: -126px;
 }
-.red{
-	background-position-x: -83px;
+
+.yellow-2 {
+	background-position-x: -82px;
+	background-position-y: -126px;
+}
+
+.yellow-3 {
+	background-position-x: -164px;
+	background-position-y: -126px;
+}
+
+.yellow-4 {
+	background-position-x: -246px;
+	background-position-y: -126px;
+}
+
+.yellow-5 {
+	background-position-x: -328px;
+	background-position-y: -126px;
+}
+
+.yellow-6 {
+	background-position-x: -410px;
+	background-position-y: -126px;
+}
+
+.yellow-7 {
+	background-position-x: -492px;
+	background-position-y: -126px;
+}
+
+.yellow-8 {
+	background-position-x: -574px;
+	background-position-y: -126px;
+}
+
+.yellow-9 {
+	background-position-x: -656px;
+	background-position-y: -126px;
+}
+
+.yellow-0 {
+	background-position-x: -738px;
+	background-position-y: -126px;
+}
+
+/****************************************************************
+* RED CARDS
+****************************************************************/
+
+.red-1 {
+	background-position-x: -82px;
 	background-position-y: -252px;
 }
-.blue {
+
+.red-2 {
+	background-position-x: -164px;
+	background-position-y: -252px;
+}
+
+.red-3 {
+	background-position-x: -246px;
+	background-position-y: -252px;
+}
+
+.red-4 {
+	background-position-x: -328px;
+	background-position-y: -252px;
+}
+
+.red-5 {
+	background-position-x: -410px;
+	background-position-y: -252px;
+}
+
+.red-6 {
+	background-position-x: -492px;
+	background-position-y: -252px;
+}
+
+.red-7 {
+	background-position-x: -574px;
+	background-position-y: -252px;
+}
+
+.red-8 {
+	background-position-x: -656px;
+	background-position-y: -252px;
+}
+
+.red-9 {
+	background-position-x: -738px;
+	background-position-y: -252px;
+}
+
+.red-0 {
+	background-position-x: -820px;
+	background-position-y: -252px;
+}
+
+/****************************************************************
+* BLUE CARDS
+****************************************************************/
+
+.blue-1 {
 	background-position-x: -164px;
 	background-position-y: -379px;
 }
-.green {
+
+.blue-2 {
+	background-position-x: -246px;
+	background-position-y: -379px;
+}
+
+.blue-3 {
+	background-position-x: -328px;
+	background-position-y: -379px;
+}
+
+.blue-4 {
+	background-position-x: -410px;
+	background-position-y: -379px;
+}
+
+.blue-5 {
+	background-position-x: -492px;
+	background-position-y: -379px;
+}
+
+.blue-6 {
+	background-position-x: -574px;
+	background-position-y: -379px;
+}
+
+.blue-7 {
+	background-position-x: -656px;
+	background-position-y: -379px;
+}
+
+.blue-8 {
+	background-position-x: -738px;
+	background-position-y: -379px;
+}
+
+.blue-9 {
+	background-position-x: -820px;
+	background-position-y: -379px;
+}
+
+.blue-0 {
+	background-position-x: -902px;
+	background-position-y: -379px;
+}
+
+/****************************************************************
+* GREEN CARDS
+****************************************************************/
+
+.green-1 {
 	background-position-x: -246px;
 	background-position-y: -504px;
 }
-.game-room{
+
+.green-2 {
+	background-position-x: -328px;
+	background-position-y: -504px;
+}
+
+.green-3 {
+	background-position-x: -410px;
+	background-position-y: -504px;
+}
+
+.green-4 {
+	background-position-x: -492px;
+	background-position-y: -504px;
+}
+
+.green-5 {
+	background-position-x: -574px;
+	background-position-y: -504px;
+}
+
+.green-6 {
+	background-position-x: -656px;
+	background-position-y: -504px;
+}
+
+.green-7 {
+	background-position-x: -738px;
+	background-position-y: -504px;
+}
+
+.green-8 {
+	background-position-x: -820px;
+	background-position-y: -504px;
+}
+
+.green-9 {
+	background-position-x: -902px;
+	background-position-y: -504px;
+}
+
+.green-0 {
+	background-position-x: 0px;
+	background-position-y: -630px;
+}
+
+/****************************************************************
+* WILD CARDS
+****************************************************************/
+
+.wild {
+	background-position-x: -82px;
+	background-position-y: 0px;
+}
+
+.wildDrawFour {
+	background-position-x: -491px;
+	background-position-y: 0px;
+}
+
+/****************************************************************
+* SPECIAL CARDS
+****************************************************************/
+.skip-yellow {
+	background-position-x: -902px;
+	background-position-y: -126px;
+}
+
+.reverse-yellow {
+	background-position-x: 0px;
+	background-position-y: -252px;
+}
+
+.draw-yellow {
+	background-position-x: -820px;
+	background-position-y: -126px;
+}
+
+.skip-red {
+	background-position-x: 0px;
+	background-position-y: -379px;
+}
+
+.reverse-red {
+	background-position-x: -82px;
+	background-position-y: -379px;
+}
+
+.draw-red {
+	background-position-x: -902px;
+	background-position-y: -252px;
+}
+
+.skip-blue {
+	background-position-x: -82px;
+	background-position-y: -504px;
+}
+
+.reverse-blue {
+	background-position-x: -164px;
+	background-position-y: -504px;
+}
+
+.draw-blue {
+	background-position-x: 0px;
+	background-position-y: -504px;
+}
+
+.skip-green {
+	background-position-x: -246px;
+	background-position-y: -630px;
+}
+
+.reverse-green {
+	background-position-x: -82px;
+	background-position-y: -630px;
+}
+
+.draw-green {
+	background-position-x: -164px;
+	background-position-y: -630px;
+}
+
+.game-room {
 	background-color: #a82724;
 }
 
+.grid-container {
+	display: grid;
+	grid-template-columns: 80px 80px 80px 80px 80px 80px 80px 80px 80px 80px;
+	grid-gap: 2px;
+}
 
