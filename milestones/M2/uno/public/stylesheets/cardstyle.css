@@ -1,3 +1,7 @@
+.game-room {
+	width: 565px;
+	height: 706px;
+}
 .card {
 	border-radius: 15px;
 	width: 80px;
@@ -308,9 +312,47 @@
 	background-color: #a82724;
 }
 
+.hand .card:nth-of-type(1) {right: 0}
+.hand .card:nth-of-type(2) {right: 16px}
+.hand .card:nth-of-type(3) {right: 32px}
+.hand .card:nth-of-type(4) {right: 48px}
+.hand .card:nth-of-type(5) {right: 64px}
+.hand .card:nth-of-type(6) {right: 80px}
+.hand .card:nth-of-type(7) {right: 96px}
+
+.user {
+	display: flex;
+	position: absolute;
+	left: 20%;
+	bottom: -20%;
+	overflow: scroll;
+}
+.player-one{
+	display: flex;
+	margin-left: 25%;
+	overflow: scroll;
+}
+
+.player-two {
+	position: absolute;
+	display: flex;
+	bottom: 5%;
+	left: -10%;
+	transform: rotate(90deg);
+	overflow: scroll;
+}
+
+.player-three {
+	position: absolute;
+	display: flex;
+	bottom: 5%;
+	left: 46%;
+	transform: rotate(90deg);
+	overflow: scroll;
+}
+
 .grid-container {
 	display: grid;
 	grid-template-columns: 80px 80px 80px 80px 80px 80px 80px 80px 80px 80px;
 	grid-gap: 2px;
 }
-
