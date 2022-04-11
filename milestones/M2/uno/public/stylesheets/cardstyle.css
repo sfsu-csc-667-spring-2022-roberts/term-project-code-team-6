@@ -1,7 +1,33 @@
-.card {
-	width: 170px;
-	height: 250px;
-	background: url("./images/card_sprites.png")
+.card{
+	border-radius: 15px;
+	width: 80px;
+	height: 126px;
+	background: transparent url('../images/card_sprites.png');
+	position: relative;
+}
+
+.backcard{
+	background-position-x: 0;
+	background-position-y: 0;
+}
+.yellow{
+	background-position-x: -1px;
+	background-position-y: -126px;
+}
+.red{
+	background-position-x: -83px;
+	background-position-y: -252px;
+}
+.blue {
+	background-position-x: -164px;
+	background-position-y: -379px;
+}
+.green {
+	background-position-x: -246px;
+	background-position-y: -504px;
+}
+.game-room{
+	background-color: #a82724;
 }
 
 
