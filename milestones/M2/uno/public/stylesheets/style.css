@@ -161,6 +161,8 @@ a {
 	flex: 3;
 	border: 1px solid gray;
 	margin-right: 1rem;
+	position: relative;
+	height: 70vh;
 }
 
 .auth-container {
