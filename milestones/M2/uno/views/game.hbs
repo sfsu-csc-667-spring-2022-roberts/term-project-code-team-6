@@ -1,53 +1,45 @@
-<link rel='stylesheet' href='../stylesheets/cardstyle.css'/>
+<link rel='stylesheet' href='../stylesheets/cardstyle.css' />
 <body>
-<p>15 playing</p>
-<div class='game'>
-    <div class='game-room' >
-            <div class = 'hand player-one'>
+	<p>15 playing</p>
+	<div class='game'>
+		<div class='game-room'>
+			<div id='player-one' class='hand player-one'>
+				{{#each playerCards.p1}}
+					<div class='card backcard'></div>
+				{{/each}}
+				{{! <div class="card backcard"></div>
                     <div class="card backcard"></div>
                     <div class="card backcard"></div>
                     <div class="card backcard"></div>
                     <div class="card backcard"></div>
                     <div class="card backcard"></div>
-                    <div class="card backcard"></div>
-                    <div class="card backcard"></div>
-            </div>
-            <div class = 'hand player-two'>
-           
-                    <div class="card backcard"></div>
-                    <div class="card backcard"></div>
-                    <div class="card backcard"></div>
-                    <div class="card backcard"></div>
-                    <div class="card backcard"></div>
-                    <div class="card backcard"></div>
-                    <div class="card backcard"></div>
-             
-            </div>
-        <div class = 'hand'>
-            <div class = 'player-three'>
-                <div class="card backcard"></div>
-                <div class="card backcard"></div>
-                <div class="card backcard"></div>
-                <div class="card backcard"></div>
-                <div class="card backcard"></div>
-                <div class="card backcard"></div>
-                <div class="card backcard"></div>
-            </div>
-        </div>
-        <div class = 'hand'>
-            <div class = 'user'>
-                <div class="card red-3"></div>
-                <div class="card blue-1"></div>
-                <div class="card blue-7"></div>
-                <div class="card wildDrawFour"></div>
-                <div class="card skip-yellow"></div>
-                <div class="card wild"></div>
-                <div class="card green-4"></div>
-            </div>
-        </div>
-    </div>
-    <div class>
-    </div>
-    {{> chat}}
-</div>
+                    <div class="card backcard"></div> }}
+			</div>
+			<div class='hand player-two'>
+				{{#each playerCards.p2}}
+					<div class='card backcard'></div>
+				{{/each}}
+			</div>
+			<div class='hand player-three'>
+				{{#each playerCards.p3}}
+					<div class='card backcard'></div>
+				{{/each}}
+			</div>
+			<div class='hand user'>
+				<div class='card red-3'></div>
+				<div class='card blue-1'></div>
+				<div class='card blue-7'></div>
+				<div class='card wildDrawFour'></div>
+				<div class='card skip-yellow'></div>
+				<div class='card wild'></div>
+				<div class='card green-4'></div>
+				<div class='card wildDrawFour'></div>
+				<div class='card wildDrawFour'></div>
+				<div class='card wildDrawFour'></div>
+			</div>
+		</div>
+		<div>
+		</div>
+		{{> chat}}
+	</div>
 </body>
