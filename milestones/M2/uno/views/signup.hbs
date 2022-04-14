@@ -1,21 +1,38 @@
 <div class='auth-container'>
-	<form action='/signup' class='auth-form'>
+	<form
+		action='/auth/signup'
+		class='auth-form'
+		method='post'
+		enctype='application/x-www-form-urlencoded'
+	>
 		<h1>Sign up</h1>
 		<div class='auth-form_input'>
 			<label for='username'>Username</label>
-			<input type='text' id='username' />
+			<input
+				type='text'
+				id='username'
+				name='username'
+				placeholder='username'
+				required
+			/>
 		</div>
 		<div class='auth-form_input'>
 			<label for='email'>Email</label>
-			<input type='text' id='email' />
+			<input type='text' id='email' name='email' placeholder='email' required />
 		</div>
 		<div class='auth-form_input'>
 			<label for='password'>Password</label>
-			<input type='password' id='password' />
+			<input
+				type='password'
+				id='password'
+				name='password'
+				placeholder='password'
+				required
+			/>
 		</div>
-		<div class="auth-from_tnc">
-			<a href="/terms&conditions">I have read the terms & conditions</a>
-			<input type='checkbox' id='tnc' />
+		<div class='auth-from_tnc'>
+			<a href='/terms&conditions'>I have read the terms & conditions</a>
+			<input type='checkbox' id='tnc' required/>
 		</div>
 		<div class='auth_button-group'>
 			<button class='primary-btn'>sign up</button>

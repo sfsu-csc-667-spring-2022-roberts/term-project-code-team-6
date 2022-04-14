@@ -207,7 +207,7 @@ a {
 .has-account:hover {
 	text-decoration: underline;
 	cursor: pointer;
-	color: var(--cancel-color);
+	/* color: var(--cancel-color); */
 }
 
 .auth-from_tnc {
@@ -217,5 +217,5 @@ a {
 .auth-from_tnc a:hover {
 	text-decoration: underline;
 	cursor: pointer;
-	color: var(--cancel-color);
+	/* color: var(--cancel-color); */
 }

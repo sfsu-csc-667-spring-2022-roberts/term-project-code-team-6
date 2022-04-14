@@ -1,4 +1,5 @@
 require('dotenv').config();
+// Load env before sequelize 
 module.exports = {
 	development: {
 		use_env_variable: 'DATABASE_URL',

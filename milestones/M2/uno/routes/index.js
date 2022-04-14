@@ -1,8 +1,10 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const authUser = require('../middleware/isAuth');
+const router = express.Router();
 
 /* GET home page. */
-router.get('/', function (req, res, next) {
+router.get('/', authUser, function (req, res, next) {
+	console.log(req.locals)
 	res.render('index', { title: 'Express', teamNumber: 'D' });
 });
 
@@ -11,7 +13,6 @@ router.get('/how-to-play', function (req, res, next) {
 	res.render('how-to');
 });
 
-/* GET how to play page. */
 router.get('/game/123', function (req, res, next) {
 	res.render('game', {
 		playerCards: {
