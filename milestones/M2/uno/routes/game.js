@@ -73,6 +73,8 @@ router.get('/:id', authUser, async (req, res, next) => {
 					p3: Array(7).fill(0),
 					user: Array(7).fill(0),
 				},
+				playerCount: fetchedGame.userCount,
+				active: fetchedGame.active
 			});
 		} else {
 			// check if the user is already in the game
@@ -103,6 +105,8 @@ router.get('/:id', authUser, async (req, res, next) => {
 			console.log('Players are: ', players);
 			res.render('game', {
 				players: players,
+				userCount: fetchedGame.userCount,
+				active: fetchedGame.active
 			});
 		}
 	} catch (err) {

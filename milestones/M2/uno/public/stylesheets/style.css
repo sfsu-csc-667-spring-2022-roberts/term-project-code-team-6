@@ -176,6 +176,17 @@ a {
 	height: 70vh;
 }
 
+.game-lobby_user {
+	display: flex;
+	gap: 1rem;
+	background-color: white;
+	height: 25%;
+	border: 2px solid black;
+	box-sizing: border-box;
+	align-items: center;
+	padding: 0 1rem;
+}
+
 .auth-container {
 	display: flex;
 	justify-content: center;
