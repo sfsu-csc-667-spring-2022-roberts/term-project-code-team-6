@@ -41,7 +41,7 @@ app.use((req, res, next) => {
 	if (req.session.email) {
 		res.locals.isAuth = true;
 	}
-	console.log(req.session);
+	// console.log(req.session);
 	next();
 });
 

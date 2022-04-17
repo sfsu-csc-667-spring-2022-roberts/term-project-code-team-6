@@ -7,8 +7,11 @@ const db = require('../db');
 router.get('/', authUser, async function (req, res, next) {
 	let query = 'SELECT id, "userCount" FROM games;';
 	const games = await db.manyOrNone(query, []);
+	query = 'SELECT COUNT(id) FROM games;'
+	const {count} = await db.one(query, []);
 	console.log(games);
-	res.render('index', { title: 'UNO', games: games });
+	console.log(count)
+	res.render('index', { title: 'UNO', games: games, count: count });
 });
 
 /* GET how to play page. */

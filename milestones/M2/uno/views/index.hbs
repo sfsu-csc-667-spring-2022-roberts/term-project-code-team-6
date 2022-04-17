@@ -1,5 +1,5 @@
 <div class='landing-top'>
-	<p>20 games</p>
+	<p>{{count}} games</p>
 	<button id='create-game' class='secondary-btn'>Create New Game</button>
 </div>
 <div class='landing'>
@@ -8,10 +8,10 @@
 			<div class='landing_list-item'>
 				<div class='landing_list-item_left'>
 					<p>id: {{id}}</p>
-					<p>players: {{userCount}}/ 4</p>
+					<p>players: {{userCount}}/4</p>
 				</div>
 				<div>
-					<a href='/game/123' class='secondary-btn'>Join</a>
+					<a href="/game/{{id}}" class='secondary-btn'>Join</a>
 				</div>
 			</div>
 		{{/each}}
@@ -27,6 +27,7 @@
 			headers: { 'Accept':'application/json', 'Content-Type': 'application/json' }, 
 			body: JSON.stringify({title: "Default Game"})}); const body = await result.json();
 			console.log(body); 
+			location.assign("/game/" + body.gameId)
 		}); 
 	}
 </script>
