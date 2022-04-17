@@ -18,6 +18,7 @@ const pgPromise = require('./db');
 const indexRouter = require('./routes/index');
 const testsRouter = require('./routes/tests');
 const authRouter = require('./routes/auth');
+const gameRouter = require('./routes/game');
 
 const app = express();
 
@@ -37,13 +38,12 @@ app.use(
 
 // Get session from parsing user request
 app.use((req, res, next) => {
-    if (req.session.email){
-        res.locals.isAuth = true;
-    }
-    console.log(req.session);
-    next();
+	if (req.session.email) {
+		res.locals.isAuth = true;
+	}
+	console.log(req.session);
+	next();
 });
-
 
 // View engine setup
 hbs.registerPartials(path.join(__dirname, 'views/partials'));
@@ -58,7 +58,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/tests', testsRouter);
-app.use('/auth', authRouter)
+app.use('/auth', authRouter);
+app.use('/game', gameRouter);
 
 // Catch 404 and forward to error handler
 app.use(function (req, res, next) {

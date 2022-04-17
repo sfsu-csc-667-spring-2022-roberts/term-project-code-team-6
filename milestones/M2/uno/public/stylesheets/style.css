@@ -94,6 +94,17 @@ a {
 	display: flex;
 }
 
+.landing-top {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 1rem;
+}
+
+.landing-top a {
+	padding: 1rem;
+}
+
 .landing_game-room {
 	flex: 3;
 	height: 70vh;

@@ -9,7 +9,7 @@ const SALT_ROUNDS = 12;
 router.post(
 	'/signup',
 	body('email').isEmail(),
-	body('username').isLength({ min: 1 }),
+	body('username').not().isEmpty().trim().escape(),
 	body('password').isLength({ min: 5 }),
 	async (req, res, next) => {
 		try {
@@ -103,7 +103,7 @@ router.post('/logout', (req, res, next) => {
 			next(err);
 		} else {
 			console.log('Session was destroyed.');
-			// res.clearCookie('csid');
+			res.clearCookie('UNO Session');
 			res.json({ status: 'OK', message: 'user is logged out' });
 		}
 	});
