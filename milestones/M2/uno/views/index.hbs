@@ -4,78 +4,17 @@
 </div>
 <div class='landing'>
 	<div class='landing_game-room'>
-		<div class='landing_list-item'>
-			<div class='landing_list-item_left'>
-				<p>id: 123</p>
-				<p>user: 20</p>
+		{{#each games}}
+			<div class='landing_list-item'>
+				<div class='landing_list-item_left'>
+					<p>id: {{id}}</p>
+					<p>players: {{userCount}}/ 4</p>
+				</div>
+				<div>
+					<a href='/game/123' class='secondary-btn'>Join</a>
+				</div>
 			</div>
-			<div>
-				<a href='/game/123' class='secondary-btn'>Join</a>
-			</div>
-		</div>
-		<div class='landing_list-item'>
-			<div class='landing_list-item_left'>
-				<p>id: 123</p>
-				<p>user: 20</p>
-			</div>
-			<div>
-				<a href='/game/123' class='secondary-btn'>Join</a>
-			</div>
-		</div>
-		<div class='landing_list-item'>
-			<div class='landing_list-item_left'>
-				<p>id: 123</p>
-				<p>user: 20</p>
-			</div>
-			<div>
-				<a href='/game/123' class='secondary-btn'>Join</a>
-			</div>
-		</div>
-		<div class='landing_list-item'>
-			<div class='landing_list-item_left'>
-				<p>id: 123</p>
-				<p>user: 20</p>
-			</div>
-			<div>
-				<a href='/game/123' class='secondary-btn'>Join</a>
-			</div>
-		</div>
-		<div class='landing_list-item'>
-			<div class='landing_list-item_left'>
-				<p>id: 123</p>
-				<p>user: 20</p>
-			</div>
-			<div>
-				<a class='secondary-btn'>Join</a>
-			</div>
-		</div>
-		<div class='landing_list-item'>
-			<div class='landing_list-item_left'>
-				<p>id: 123</p>
-				<p>user: 20</p>
-			</div>
-			<div>
-				<a class='secondary-btn'>Join</a>
-			</div>
-		</div>
-		<div class='landing_list-item'>
-			<div class='landing_list-item_left'>
-				<p>id: 123</p>
-				<p>user: 20</p>
-			</div>
-			<div>
-				<a class='secondary-btn'>Join</a>
-			</div>
-		</div>
-		<div class='landing_list-item'>
-			<div class='landing_list-item_left'>
-				<p>id: 123</p>
-				<p>user: 20</p>
-			</div>
-			<div>
-				<a class='secondary-btn'>Join</a>
-			</div>
-		</div>
+		{{/each}}
 	</div>
 	{{> chat}}
 </div>
