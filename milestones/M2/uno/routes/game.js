@@ -79,9 +79,9 @@ router.get('/:id', authUser, async (req, res, next) => {
 
 			query =
 				'SELECT id, color, value FROM game_cards\
-			JOIN cards ON card_id = cards.id\
-			WHERE game_id = $1 AND user_id = $2\
-			ORDER BY "order"';
+				JOIN cards ON card_id = cards.id\
+				WHERE game_id = $1 AND user_id = $2\
+				ORDER BY "order"';
 			const userCards = await db.any(query, [gameId, userId]);
 			console.log(userCards);
 
@@ -111,20 +111,27 @@ router.get('/:id', authUser, async (req, res, next) => {
 				const p1CardCountObj = await db.one(query, [gameId, p1Id]);
 				playerCards.p1 = new Array(+p1CardCountObj.count).fill(0);
 			} else if (userIdList.length == 3) {
+				console.log('to-do');
 			} else {
+				console.log('to-do');
 			}
 
 			playerCards.user = userCards;
 
+			query =
+				'SELECT id, color, value, rotate FROM game_cards\
+				JOIN cards ON card_id = cards.id\
+				WHERE game_id = $1 AND discarded = true\
+				ORDER BY "order";';
+			const discardedCards = await db.manyOrNone(query, [gameId]);
+
 			res.render('game', {
 				playerCards: playerCards,
-				discardedCards: [
-					{ id: 101, color: 'yellow', value: '0', rotate: 1 * 30 },
-					{ id: 102, color: 'wild', value: 'draw4', rotate: 8 * 30 },
-				],
+				discardedCards: discardedCards,
 				userCount: fetchedGame.userCount,
 				active: fetchedGame.active,
 				gameId: fetchedGame.id,
+				isUserTurn: fetchedGame.player_turn === userIndex,
 			});
 		} else {
 			if (fetchedPlayer) {
@@ -229,22 +236,72 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 	try {
 		const gameId = req.params.id;
 		const cardId = req.params.cardId;
+		const userId = req.session.userId;
 		console.log('gameId is: ', gameId);
 		console.log('cardId is: ', cardId);
 
-		let query = 'SELECT "discardedCount"\
+		let query =
+			'SELECT user_id\
+		FROM game_users\
+		WHERE game_id = $1\
+		ORDER BY player_order;';
+		const userIdList = await db.any(query, [gameId]);
+		console.log(userIdList);
+
+		const userIndex = userIdList.findIndex(uid => uid.user_id === userId);
+
+		query = 'SELECT *\
 		FROM games\
 		WHERE id = $1';
-		const { discardedCount } = await db.one(query, [gameId]);
-		console.log('Total discarded cards: ', discardedCount);
+		const fetchedGame = await db.one(query, [gameId]);
+		console.log('Game info: ', fetchedGame);
+		console.log('Total discarded cards: ', fetchedGame.discardedCount);
+
+		if (userIndex === fetchedGame.player_turn) {
+			console.log("In user's turn");
+		} else {
+			return res
+				.status(400)
+				.json({ message: "Cannot not play cards in other user's turn" });
+		}
 
 		query =
 			'UPDATE game_cards\
 			SET user_id = null, discarded = true, "order" = $1, rotate = $2\
 			WHERE game_id = $3 AND card_id = $4;';
-		const newOrder = discardedCount + 1;
-		const rotate = Math.floor(Math.random() * 8); // rotate 0 - 7 (0 deg to 315 deg)
+		const newOrder = fetchedGame.discardedCount + 1;
+		const rotate = Math.floor(Math.random() * 23) * 15; // rotate(0 deg to 359 deg)
 		await db.any(query, [newOrder, rotate, gameId, cardId]);
+
+		let updatedPlayerTurn =
+			(fetchedGame.clockwise
+				? fetchedGame.player_turn - 1
+				: fetchedGame.player_turn + 1) % fetchedGame.userCount;
+		updatedPlayerTurn =
+			updatedPlayerTurn < 0 ? fetchedGame.userCount - 1 : updatedPlayerTurn;
+		console.log('updated player turn: ', updatedPlayerTurn);
+		query =
+			'UPDATE games\
+				SET "discardedCount" = $1, player_turn = $2\
+				WHERE id = $3;';
+		await db.any(query, [
+			fetchedGame.discardedCount + 1,
+			updatedPlayerTurn,
+			gameId,
+		]);
+
+		query =
+			'SELECT COUNT(*)\
+		FROM game_cards\
+		WHERE game_id = $1 AND user_id = $2';
+
+		const { count } = await db.one(query, [gameId, userId]);
+		// win condition met, brodcast this message
+		console.log('current hand count: ', count);
+		if (count == 0) {
+			console.log(`player ${userId} wins`);
+			return res.status(201).json({ message: `player ${userId} wins` });
+		}
 
 		res.status(201).json({ message: `card ${cardId} is played` });
 	} catch (err) {

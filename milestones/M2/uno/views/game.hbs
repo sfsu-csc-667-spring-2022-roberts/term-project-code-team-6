@@ -35,6 +35,9 @@
 						{{/each}}
 						</div>
 					</div>
+					{{#if isUserTurn}}
+						<h1>Your turn</h1>
+					{{/if}}
 			{{else}}
 				{{#each players}}
 					<div class="game-lobby_user">
@@ -58,7 +61,7 @@
 	}
 
 	const userCards = document.getElementById('user-cards');
-	if (userCards) {
+	if (userCards && {{isUserTurn}}) {
 		for (card of userCards.children) {
 			let cardId = card.id;
 			card.addEventListener("click", async () => {
