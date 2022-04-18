@@ -84,11 +84,11 @@ router.post(
 
 			res.locals.isAuth = true;
 
+			console.log("Session email: ", req.session.email )
+			console.log("Session userId: ", req.session.userId)
 			console.log('local isAuth', res.locals.isAuth);
 
 			res.redirect('/');
-
-			// res.status(200).json({ userId: user._id, token: token });
 		} catch (err) {
 			next(err);
 		}
