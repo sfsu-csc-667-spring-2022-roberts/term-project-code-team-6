@@ -20,7 +20,6 @@
 </div>
 <script>
 	const createGameBtn = document.getElementById('create-game');
-	console.log(createGameBtn); 
 	if (createGameBtn) {
 		createGameBtn.addEventListener('click', async () => { 
 			const result = await fetch('/game/create', { method: 'POST', 

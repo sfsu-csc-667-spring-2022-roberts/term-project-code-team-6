@@ -380,8 +380,19 @@
 	/* overflow: scroll; */
 }
 
-.grid-container {
-	display: grid;
-	grid-template-columns: 80px 80px 80px 80px 80px 80px 80px 80px 80px 80px;
-	grid-gap: 2px;
+.discarded-cards {
+	position: absolute;
+	width: 80px;
+	height: 126px;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.discarded-cards_container {
+	position: relative;
+}
+
+.discarded-cards_container .card {
+	position: absolute;
 }

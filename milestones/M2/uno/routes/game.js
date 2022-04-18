@@ -61,11 +61,22 @@ router.get('/:id', authUser, async (req, res, next) => {
 	try {
 		const gameId = req.params.id;
 		const userId = req.session.userId;
+
 		let query = 'SELECT * FROM games WHERE id = $1';
 		const fetchedGame = await db.oneOrNone(query, gameId);
 		if (!fetchedGame) throw new Error('Game not found');
 		console.log('fetchedGame: ', fetchedGame);
+
+		// check if the user is already in the game
+		query = 'SELECT * FROM game_users WHERE game_id = $1 AND user_id = $2;';
+		const fetchedPlayer = await db.oneOrNone(query, [fetchedGame.id, userId]);
+
 		if (fetchedGame.active) {
+			// <<NOTE>> Not allow other user to watch an active game for now
+			if (!fetchedPlayer) {
+				return res.redirect('/');
+			}
+
 			query =
 				'SELECT id, color, value FROM game_cards\
 			JOIN cards ON card_id = cards.id\
@@ -74,21 +85,48 @@ router.get('/:id', authUser, async (req, res, next) => {
 			const userCards = await db.any(query, [gameId, userId]);
 			console.log(userCards);
 
+			query =
+				'SELECT user_id\
+				FROM game_users\
+				WHERE game_id = $1\
+				ORDER BY player_order;';
+			const userIdList = await db.any(query, [gameId]);
+			console.log(userIdList);
+
+			const userIndex = userIdList.findIndex(uid => uid.user_id === userId);
+			console.log('user index is at: ', userIndex);
+
+			// <<NOTE>> need update the query if we add observer
+			query =
+				'SELECT COUNT(*)\
+				FROM game_cards\
+				WHERE game_id = $1 AND user_id = $2;';
+			playerCards = {};
+			if (userIdList.length == 2) {
+				const p1Index = (userIndex + 1) % userIdList.length;
+				console.log('p1 index is at: ', p1Index);
+				const p1Id = userIdList[p1Index].user_id;
+				console.log('p1Id: ', p1Id);
+
+				const p1CardCountObj = await db.one(query, [gameId, p1Id]);
+				playerCards.p1 = new Array(+p1CardCountObj.count).fill(0);
+			} else if (userIdList.length == 3) {
+			} else {
+			}
+
+			playerCards.user = userCards;
+
 			res.render('game', {
-				playerCards: {
-					p1: Array(7).fill(0),
-					p2: Array(7).fill(0),
-					p3: Array(7).fill(0),
-					user: userCards,
-				},
+				playerCards: playerCards,
+				discardedCards: [
+					{ id: 101, color: 'yellow', value: '0', rotate: 1 * 30 },
+					{ id: 102, color: 'wild', value: 'draw4', rotate: 8 * 30 },
+				],
 				userCount: fetchedGame.userCount,
 				active: fetchedGame.active,
 				gameId: fetchedGame.id,
 			});
 		} else {
-			// check if the user is already in the game
-			query = 'SELECT * FROM game_users WHERE game_id = $1 AND user_id = $2;';
-			const fetchedPlayer = await db.oneOrNone(query, [fetchedGame.id, userId]);
 			if (fetchedPlayer) {
 				console.log('fetchedPlayer: ', fetchedPlayer);
 			}
@@ -168,20 +206,47 @@ router.post('/:id/start', authUser, async (req, res, next) => {
 		console.log(userIdList);
 
 		let start = 1;
-		let end = 7;
+		let end = INITIAL_CARD_COUNT;
 		for (let i = 0; i < userIdList.length; i++) {
 			query =
 				'UPDATE game_cards\
 			SET user_id = $1\
 			WHERE "order" BETWEEN $2 AND $3 and game_id = $4;';
 			console.log('Assgining cards to user: ', userIdList[i].user_id);
-			await db.any(query, [userIdList[i].user_id, start, end, gameId])
+			await db.any(query, [userIdList[i].user_id, start, end, gameId]);
 			start = end + 1;
 			end = end + INITIAL_CARD_COUNT;
 		}
 
 		// Redirect to /game/{id}
 		res.redirect('/game/' + gameId);
+	} catch (err) {
+		next(err);
+	}
+});
+
+router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
+	try {
+		const gameId = req.params.id;
+		const cardId = req.params.cardId;
+		console.log('gameId is: ', gameId);
+		console.log('cardId is: ', cardId);
+
+		let query = 'SELECT "discardedCount"\
+		FROM games\
+		WHERE id = $1';
+		const { discardedCount } = await db.one(query, [gameId]);
+		console.log('Total discarded cards: ', discardedCount);
+
+		query =
+			'UPDATE game_cards\
+			SET user_id = null, discarded = true, "order" = $1, rotate = $2\
+			WHERE game_id = $3 AND card_id = $4;';
+		const newOrder = discardedCount + 1;
+		const rotate = Math.floor(Math.random() * 8); // rotate 0 - 7 (0 deg to 315 deg)
+		await db.any(query, [newOrder, rotate, gameId, cardId]);
+
+		res.status(201).json({ message: `card ${cardId} is played` });
 	} catch (err) {
 		next(err);
 	}

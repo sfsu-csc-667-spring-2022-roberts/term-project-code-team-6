@@ -8,7 +8,7 @@
 <div class='game'>
 		<div class='game-room'>
 			{{#if active}}
-					<div id='player-one' class='hand player-one'>
+					<div class='hand player-one'>
 						{{#each playerCards.p1}}
 							<div class='card backcard'></div>
 						{{/each}}
@@ -23,18 +23,17 @@
 							<div class='card backcard'></div>
 						{{/each}}
 					</div>
-					<div class='hand user'>
+					<div id="user-cards" class='hand user'>
 						{{#each playerCards.user}}
 							<div id={{id}} class='card {{color}}-{{value}}'></div>
 						{{/each}}
-						{{!-- <div class='card red-3'></div>
-						<div class='card blue-1'></div>
-						<div class='card blue-7'></div>
-						<div class='card wild-wild'></div>
-						<div class='card yellow-skip'></div>
-						<div class='card wild-wild'></div>
-						<div class='card green-4'></div>
-						<div class='card wild-draw4'></div> --}}
+					</div>
+					<div class='discarded-cards'>
+						<div class ='discarded-cards_container'>
+						{{#each discardedCards}}
+							<div id={{id}} class='card {{color}}-{{value}}' style="transform: rotate({{rotate}}deg)"></div>
+						{{/each}}
+						</div>
 					</div>
 			{{else}}
 				{{#each players}}
@@ -54,9 +53,19 @@
 	const startBtn = document.getElementById('start-game');
 	if (startBtn) {
 		startBtn.addEventListener("click", async () => {
-			const result = await fetch('/game/{{{gameId}}}/start', { method: 'POST'}); 
-			const body = await result.json();
-			console.log(body); 
+			await fetch('/game/{{{gameId}}}/start', { method: 'POST'}); 
 		})
+	}
+
+	const userCards = document.getElementById('user-cards');
+	if (userCards) {
+		for (card of userCards.children) {
+			let cardId = card.id;
+			card.addEventListener("click", async () => {
+				const result = await fetch('/game/{{{gameId}}}/play/' + cardId, { method: 'POST'}); 
+				const body = await result.json();
+				console.log(body); 
+			})
+		}
 	}
 </script>

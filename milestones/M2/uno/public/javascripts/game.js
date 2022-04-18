@@ -3,7 +3,7 @@ const CARD_WIDTH = 80;
 const CARD_HEIGHT = 126;
 
 const playerCards = document.getElementsByClassName('hand');
-if (playerCards.length > 0) {
+if (playerCards && playerCards.length > 0) {
 	for (hand of playerCards) {
 		let right = 0;
 		for (card of hand.children) {
@@ -40,3 +40,4 @@ if (playerCards.length > 0) {
 		-2
 	}px)`;
 }
+

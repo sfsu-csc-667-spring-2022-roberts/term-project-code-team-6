@@ -1,16 +1,14 @@
 'use strict';
 
 module.exports = {
-  async up (queryInterface, Sequelize) {
+	async up(queryInterface, Sequelize) {
 		return queryInterface.addColumn('games', 'active', {
 			type: Sequelize.BOOLEAN,
-      defaultValue: false
+			defaultValue: false,
 		});
-  },
+	},
 
-  async down (queryInterface, Sequelize) {
-    return queryInterface.removeColumn('games', 'active', {
-			type: Sequelize.INTEGER,
-		});
-  }
+	async down(queryInterface, Sequelize) {
+		return queryInterface.removeColumn('games', 'active');
+	},
 };
