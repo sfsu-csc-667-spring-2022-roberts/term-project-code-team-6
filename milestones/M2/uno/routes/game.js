@@ -66,15 +66,24 @@ router.get('/:id', authUser, async (req, res, next) => {
 		if (!fetchedGame) throw new Error('Game not found');
 		console.log('fetchedGame: ', fetchedGame);
 		if (fetchedGame.active) {
+			query =
+				'SELECT id, color, value FROM game_cards\
+			JOIN cards ON card_id = cards.id\
+			WHERE game_id = $1 AND user_id = $2\
+			ORDER BY "order"';
+			const userCards = await db.any(query, [gameId, userId]);
+			console.log(userCards);
+
 			res.render('game', {
 				playerCards: {
 					p1: Array(7).fill(0),
 					p2: Array(7).fill(0),
 					p3: Array(7).fill(0),
-					user: Array(7).fill(0),
+					user: userCards,
 				},
 				playerCount: fetchedGame.userCount,
-				active: fetchedGame.active
+				active: fetchedGame.active,
+				gameId: fetchedGame.id,
 			});
 		} else {
 			// check if the user is already in the game
@@ -97,18 +106,47 @@ router.get('/:id', authUser, async (req, res, next) => {
 			} else {
 				console.log('observers');
 			}
+
 			query =
 				'SELECT id AS uid, username, "isReady" FROM game_users \
 					JOIN users ON user_id = users.id\
 					WHERE game_id = $1';
 			const players = await db.manyOrNone(query, fetchedGame.id);
 			console.log('Players are: ', players);
+
 			res.render('game', {
 				players: players,
 				userCount: fetchedGame.userCount,
-				active: fetchedGame.active
+				active: fetchedGame.active,
+				gameId: fetchedGame.id,
 			});
 		}
+	} catch (err) {
+		next(err);
+	}
+});
+
+// Start game
+router.post('/:id/start', authUser, async (req, res, next) => {
+	try {
+		const gameId = req.params.id;
+		const userId = req.session.userId;
+		console.log(gameId);
+
+		// Set game to active
+		let query = 'UPDATE games SET active = true WHERE id = $1;';
+		await db.any(query, [gameId]);
+
+		// Assgin cards to players
+
+		// Redirect to /game/{id}
+		// query = 'SELECT * FROM game_cards\
+		// JOIN cards ON card_id = cards.id\
+		// WHERE game_id = $1 AND user_id = $2;'
+		// const userCards = await db.any(query, [gameId, userId]);
+		// console.log(userCards)
+
+		res.redirect('/game/' + gameId);
 	} catch (err) {
 		next(err);
 	}

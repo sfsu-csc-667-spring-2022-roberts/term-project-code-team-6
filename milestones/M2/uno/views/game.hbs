@@ -1,48 +1,62 @@
 <link rel='stylesheet' href='../stylesheets/cardstyle.css' />
-<body>
+<div class='landing-top'>
 	<p>{{userCount}} playing</p>
-	<div class='game'>
-			<div class='game-room'>
-				{{#if active}}
-						<div id='player-one' class='hand player-one'>
-							{{#each playerCards.p1}}
-								<div class='card backcard'></div>
-							{{/each}}
-						</div>
-						<div class='hand player-two'>
-							{{#each playerCards.p2}}
-								<div class='card backcard'></div>
-							{{/each}}
-						</div>
-						<div class='hand player-three'>
-							{{#each playerCards.p3}}
-								<div class='card backcard'></div>
-							{{/each}}
-						</div>
-						<div class='hand user'>
-							<div class='card red-3'></div>
-							<div class='card blue-1'></div>
-							<div class='card blue-7'></div>
-							<div class='card wildDrawFour'></div>
-							<div class='card skip-yellow'></div>
-							<div class='card wild'></div>
-							<div class='card green-4'></div>
-							<div class='card wildDrawFour'></div>
-							<div class='card wildDrawFour'></div>
-							<div class='card wildDrawFour'></div>
-						</div>
-				{{else}}
-					{{#each players}}
-						<div class="game-lobby_user">
-							<p>uid: {{uid}}</p>
-							<p>username: {{username}}</p>
-							<p>ready: {{isReady}}</p>
-						</div>
-					{{/each}}
-				{{/if}}
-			</div>
-		<div>
+	{{#unless active}}
+		<button id='start-game' class='secondary-btn'>Start</button>
+	{{/unless}}
+</div>
+<div class='game'>
+		<div class='game-room'>
+			{{#if active}}
+					<div id='player-one' class='hand player-one'>
+						{{#each playerCards.p1}}
+							<div class='card backcard'></div>
+						{{/each}}
+					</div>
+					<div class='hand player-two'>
+						{{#each playerCards.p2}}
+							<div class='card backcard'></div>
+						{{/each}}
+					</div>
+					<div class='hand player-three'>
+						{{#each playerCards.p3}}
+							<div class='card backcard'></div>
+						{{/each}}
+					</div>
+					<div class='hand user'>
+						{{#each playerCards.user}}
+							<div id={{id}} class='card {{color}}-{{value}}'></div>
+						{{/each}}
+						{{!-- <div class='card red-3'></div>
+						<div class='card blue-1'></div>
+						<div class='card blue-7'></div>
+						<div class='card wild-wild'></div>
+						<div class='card yellow-skip'></div>
+						<div class='card wild-wild'></div>
+						<div class='card green-4'></div>
+						<div class='card wild-draw4'></div> --}}
+					</div>
+			{{else}}
+				{{#each players}}
+					<div class="game-lobby_user">
+						<p>uid: {{uid}}</p>
+						<p>username: {{username}}</p>
+						<p>ready: {{isReady}}</p>
+					</div>
+				{{/each}}
+			{{/if}}
 		</div>
-		{{> chat}}
+	<div>
 	</div>
-</body>
+	{{> chat}}
+</div>
+<script>
+	const startBtn = document.getElementById('start-game');
+	if (startBtn) {
+		startBtn.addEventListener("click", async () => {
+			const result = await fetch('/game/{{{gameId}}}/start', { method: 'POST'}); 
+			const body = await result.json();
+			console.log(body); 
+		})
+	}
+</script>

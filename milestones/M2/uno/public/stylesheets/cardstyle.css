@@ -245,12 +245,12 @@
 * WILD CARDS
 ****************************************************************/
 
-.wild {
+.wild-wild {
 	background-position-x: -82px;
 	background-position-y: 0px;
 }
 
-.wildDrawFour {
+.wild-draw4 {
 	background-position-x: -491px;
 	background-position-y: 0px;
 }
@@ -258,62 +258,62 @@
 /****************************************************************
 * SPECIAL CARDS
 ****************************************************************/
-.skip-yellow {
+.yellow-skip {
 	background-position-x: -902px;
 	background-position-y: -126px;
 }
 
-.reverse-yellow {
+.yellow-reverse {
 	background-position-x: 0px;
 	background-position-y: -252px;
 }
 
-.draw-yellow {
+.yellow-draw {
 	background-position-x: -820px;
 	background-position-y: -126px;
 }
 
-.skip-red {
+.red-skip {
 	background-position-x: 0px;
 	background-position-y: -379px;
 }
 
-.reverse-red {
+.red-reverse {
 	background-position-x: -82px;
 	background-position-y: -379px;
 }
 
-.draw-red {
+.red-skip {
 	background-position-x: -902px;
 	background-position-y: -252px;
 }
 
-.skip-blue {
+.blue-skip {
 	background-position-x: -82px;
 	background-position-y: -504px;
 }
 
-.reverse-blue {
+.blue-reverse {
 	background-position-x: -164px;
 	background-position-y: -504px;
 }
 
-.draw-blue {
+.blue-draw {
 	background-position-x: 0px;
 	background-position-y: -504px;
 }
 
-.skip-green {
+.green-skip {
 	background-position-x: -246px;
 	background-position-y: -630px;
 }
 
-.reverse-green {
+.green-reverse {
 	background-position-x: -82px;
 	background-position-y: -630px;
 }
 
-.draw-green {
+.green-draw {
 	background-position-x: -164px;
 	background-position-y: -630px;
 }
