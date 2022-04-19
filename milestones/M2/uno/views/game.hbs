@@ -5,7 +5,7 @@
 		<button id='start-game' class='secondary-btn'>Start</button>
 	{{/unless}}
 </div>
-<div class='game'>
+<div id={{gameId}} class='game'>
 		<div class='game-room'>
 			{{#if active}}
 					<div class='hand player-one'>
@@ -30,9 +30,9 @@
 					</div>
 					<div class='discarded-cards'>
 						<div class ='discarded-cards_container'>
-						{{#each discardedCards}}
-							<div id={{id}} class='card {{color}}-{{value}}' style="transform: rotate({{rotate}}deg)"></div>
-						{{/each}}
+							{{#each discardedCards}}
+								<div id={{id}} class='card {{color}}-{{value}}' style="transform: rotate({{rotate}}deg)"></div>
+							{{/each}}
 						</div>
 					</div>
 					{{#if isUserTurn}}
@@ -52,23 +52,3 @@
 	</div>
 	{{> chat}}
 </div>
-<script>
-	const startBtn = document.getElementById('start-game');
-	if (startBtn) {
-		startBtn.addEventListener("click", async () => {
-			await fetch('/game/{{{gameId}}}/start', { method: 'POST'}); 
-		})
-	}
-
-	const userCards = document.getElementById('user-cards');
-	if (userCards && {{isUserTurn}}) {
-		for (card of userCards.children) {
-			let cardId = card.id;
-			card.addEventListener("click", async () => {
-				const result = await fetch('/game/{{{gameId}}}/play/' + cardId, { method: 'POST'}); 
-				const body = await result.json();
-				console.log(body); 
-			})
-		}
-	}
-</script>

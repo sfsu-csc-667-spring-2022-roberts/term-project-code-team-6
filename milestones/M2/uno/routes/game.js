@@ -184,9 +184,14 @@ router.post('/:id/start', authUser, async (req, res, next) => {
 		const { userCount } = await db.one(query, [gameId]);
 		console.log('Current player count is: ', userCount);
 
-		if (userCount < 2) {
-			throw new Error('Must have at least 2 players in the room');
-		}
+		// if (userCount < 2) {
+		// 	return res
+		// 		.status(400)
+		// 		.json({
+		// 			status: -1,
+		// 			message: 'Must have at least 2 players to start the game',
+		// 		});
+		// }
 
 		// Set game to active
 		query = 'UPDATE games SET active = true WHERE id = $1;';
@@ -239,6 +244,8 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		const userId = req.session.userId;
 		console.log('gameId is: ', gameId);
 		console.log('cardId is: ', cardId);
+
+		// check if player has that card
 
 		let query =
 			'SELECT user_id\
@@ -303,7 +310,13 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 			return res.status(201).json({ message: `player ${userId} wins` });
 		}
 
-		res.status(201).json({ message: `card ${cardId} is played` });
+		res
+			.status(201)
+			.json({
+				message: `card ${cardId} is played`,
+				cardId: cardId,
+				rotate: rotate,
+			});
 	} catch (err) {
 		next(err);
 	}
