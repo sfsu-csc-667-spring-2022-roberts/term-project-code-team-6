@@ -63,6 +63,7 @@ if (userCards && gameId) {
 			});
 			const body = await result.json();
 			console.log(body);
+			if (body.status && body.status == 1001) return;
 			const card = document.getElementById(cardId);
 			console.log(card);
 			const newDiscarded = document.createElement('div');
@@ -72,9 +73,12 @@ if (userCards && gameId) {
 			const discardedContainer = document.getElementsByClassName(
 				'discarded-cards_container'
 			);
-			console.log(discardedContainer[0]);
 			discardedContainer[0].appendChild(newDiscarded);
 			card.remove();
+
+			// remove your turn notice
+			const yourTurn = document.getElementById('your-turn');
+			yourTurn.remove();
 			updateBoard();
 		});
 	}

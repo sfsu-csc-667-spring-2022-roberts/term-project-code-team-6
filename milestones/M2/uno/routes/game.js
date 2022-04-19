@@ -268,8 +268,11 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 			console.log("In user's turn");
 		} else {
 			return res
-				.status(400)
-				.json({ message: "Cannot not play cards in other user's turn" });
+				.status(200)
+				.json({
+					message: "Cannot not play cards in other user's turn",
+					status: 1001,
+				});
 		}
 
 		query =
@@ -310,13 +313,11 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 			return res.status(201).json({ message: `player ${userId} wins` });
 		}
 
-		res
-			.status(201)
-			.json({
-				message: `card ${cardId} is played`,
-				cardId: cardId,
-				rotate: rotate,
-			});
+		res.status(201).json({
+			message: `card ${cardId} is played`,
+			cardId: cardId,
+			rotate: rotate,
+		});
 	} catch (err) {
 		next(err);
 	}
