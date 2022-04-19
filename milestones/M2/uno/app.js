@@ -22,6 +22,8 @@ const gameRouter = require('./routes/game');
 
 const app = express();
 
+app.socket = require('./sockets');
+
 // Session Store
 app.use(
 	expressSession({
