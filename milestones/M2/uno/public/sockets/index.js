@@ -2,7 +2,7 @@ const socketio = require('socket.io');
 const socket = socketio();
 
 
-server.on("connection", (socket) => {
+socket.on("connection", (socket) => {
     
 });
 
