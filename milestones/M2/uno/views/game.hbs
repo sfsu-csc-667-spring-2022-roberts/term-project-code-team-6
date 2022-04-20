@@ -8,17 +8,17 @@
 <div id={{gameId}} class='game'>
 		<div id="game-room" class='game-room'>
 			{{#if active}}
-					<div class='hand player-one'>
+					<div id="p1" class='hand player-one'>
 						{{#each playerCards.p1}}
 							<div class='card backcard'></div>
 						{{/each}}
 					</div>
-					<div class='hand player-two'>
+					<div id="p2" class='hand player-two'>
 						{{#each playerCards.p2}}
 							<div class='card backcard'></div>
 						{{/each}}
 					</div>
-					<div class='hand player-three'>
+					<div id="p3" class='hand player-three'>
 						{{#each playerCards.p3}}
 							<div class='card backcard'></div>
 						{{/each}}

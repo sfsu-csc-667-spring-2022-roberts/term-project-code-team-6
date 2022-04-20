@@ -128,9 +128,31 @@ socket.on('play card', async data => {
 	console.log(data);
 	const className = `card ${data.color}-${data.value}`;
 	createNewDiscardedCard(className, data.id, data.rotate);
+
 	const result = await fetch('/userInfo');
 	const body = await result.json();
 	console.log(body);
+
+	if (data.nextPlayerId === body.uid) {
+		const yourTurnElm = document.createElement('h1');
+		yourTurnElm.innerText = 'Your turn';
+		yourTurnElm.id = 'your-turn';
+		gameRoomDiv.appendChild(yourTurnElm);
+	}
+	console.log(data.userIdList);
+
+	if (data.playedBy !== body.uid) {
+		const userIndex = data.userIdList.findIndex(
+			uid => uid.user_id === body.uid
+		);
+		console.log('user index is: ', userIndex);
+
+		const p1 = document.getElementById('p1');
+		if (data.userIdList.length == 2) {
+			p1.removeChild(p1.children[p1.children.length - 1]);
+		}
+	}
+
 	updateBoard();
 });
 

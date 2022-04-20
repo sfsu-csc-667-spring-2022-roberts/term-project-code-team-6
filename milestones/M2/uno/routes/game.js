@@ -331,12 +331,17 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		FROM cards\
 		WHERE id = $1';
 		const fetchedCard = await db.one(query, [cardId]);
-		fetchedCard.rotate = rotate;
-		fetchedCard.nextPlayer = userIdList[updatedPlayerTurn];
-		fetchedCard.playedBy = userId;
-		console.log('next player is: ', fetchedCard.nextPlayer);
+		console.log('next player is: ', userIdList[updatedPlayerTurn].user_id);
 
-		socketapi.io.emit('play card', fetchedCard);
+		socketapi.io.emit('play card', {
+			id: fetchedCard.id,
+			color: fetchedCard.color,
+			value: fetchedCard.value,
+			rotate: rotate,
+			nextPlayerId: userIdList[updatedPlayerTurn].user_id,
+			playedBy: userId,
+			userIdList: userIdList,
+		});
 
 		res.status(201).json({
 			message: `card ${cardId} is played`,
