@@ -46,6 +46,8 @@ const userCards = document.getElementById('user-cards');
 const game = document.getElementsByClassName('game');
 const gameId = game.length > 0 ? game[0].id : null;
 
+socket.emit('join room', { gameId: gameId });
+
 const startBtn = document.getElementById('start-game');
 if (startBtn && gameId) {
 	startBtn.addEventListener('click', async () => {
@@ -109,22 +111,24 @@ if (userCards && gameId) {
 const gameRoomDiv = document.getElementById('game-room');
 const userCount = document.getElementById('user-count');
 
-socket.on('join room', data => {
+socket.on('join game', data => {
 	console.log(data);
-	const newLobbyUser = document.createElement('div');
-	const uid = document.createElement('p');
-	const username = document.createElement('p');
-	const ready = document.createElement('p');
-	uid.innerText = `uid: ${data.uid}`;
-	username.innerText = `username: ${data.username}`;
-	ready.innerText = 'false';
-	newLobbyUser.appendChild(uid);
-	newLobbyUser.appendChild(username);
-	newLobbyUser.appendChild(ready);
-	newLobbyUser.className = 'game-lobby_user';
-	userCount.innerText = `${data.userCount} playing`;
+	if (data.gameId && data.gameId == gameId) {
+		const newLobbyUser = document.createElement('div');
+		const uid = document.createElement('p');
+		const username = document.createElement('p');
+		const ready = document.createElement('p');
+		uid.innerText = `uid: ${data.uid}`;
+		username.innerText = `username: ${data.username}`;
+		ready.innerText = 'false';
+		newLobbyUser.appendChild(uid);
+		newLobbyUser.appendChild(username);
+		newLobbyUser.appendChild(ready);
+		newLobbyUser.className = 'game-lobby_user';
+		userCount.innerText = `${data.userCount} playing`;
 
-	gameRoomDiv.appendChild(newLobbyUser);
+		gameRoomDiv.appendChild(newLobbyUser);
+	}
 });
 
 socket.on('start game', data => {
@@ -166,5 +170,7 @@ socket.on('play card', async data => {
 		updateBoard();
 	}
 });
+
+// socket.on win => remove card listener so user can not play cards
 
 updateBoard();

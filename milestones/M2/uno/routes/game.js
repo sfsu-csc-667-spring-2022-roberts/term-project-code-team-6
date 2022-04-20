@@ -156,7 +156,10 @@ router.get('/:id', authUser, async (req, res, next) => {
 				query = 'SELECT username FROM users WHERE id = $1;';
 				const { username } = await db.one(query, [userId]);
 
-				socketApi.io.emit('join room', {
+				// console.log("sockets is: ", socketApi.io.sockets.broadcast)
+
+				socketApi.io.emit('join game', {
+					gameId: gameId,
 					uid: userId,
 					username: username,
 					userCount: updatedUserCount,
