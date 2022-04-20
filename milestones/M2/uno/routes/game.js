@@ -3,7 +3,7 @@ const router = express.Router();
 const authUser = require('../middleware/isAuth');
 const { body, validationResult } = require('express-validator');
 const db = require('../db');
-let socketapi = require('../sockets');
+const socketApi = require('../sockets');
 
 // Create Game
 router.post(
@@ -156,7 +156,7 @@ router.get('/:id', authUser, async (req, res, next) => {
 				query = 'SELECT username FROM users WHERE id = $1;';
 				const { username } = await db.one(query, [userId]);
 
-				socketapi.io.emit('join room', {
+				socketApi.io.emit('join room', {
 					uid: userId,
 					username: username,
 					userCount: updatedUserCount,
@@ -244,7 +244,7 @@ router.post('/:id/start', authUser, async (req, res, next) => {
 			end = end + INITIAL_CARD_COUNT;
 		}
 
-		socketapi.io.emit('start game', { message: 'Game started' });
+		socketApi.io.emit('start game', { message: 'Game started' });
 
 		// Redirect to /game/{id}
 		// res.redirect('/game/' + gameId);
@@ -333,20 +333,29 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		const fetchedCard = await db.one(query, [cardId]);
 		console.log('next player is: ', userIdList[updatedPlayerTurn].user_id);
 
-		socketapi.io.emit('play card', {
-			id: fetchedCard.id,
-			color: fetchedCard.color,
-			value: fetchedCard.value,
-			rotate: rotate,
-			nextPlayerId: userIdList[updatedPlayerTurn].user_id,
-			playedBy: userId,
-			userIdList: userIdList,
-		});
+		// console.log('broadcast is: ', socketApi.io.broadcast);
+		// socketApi.io.on('play card', socket => {
+		// 	console.log('socket play card');
+		// 	socket.broadcast.emit('play card', {
+		// 		id: fetchedCard.id,
+		// 		color: fetchedCard.color,
+		// 		value: fetchedCard.value,
+		// 		rotate: rotate,
+		// 		nextPlayerId: userIdList[updatedPlayerTurn].user_id,
+		// 		playedBy: userId,
+		// 		userIdList: userIdList,
+		// 	});
+		// });
 
 		res.status(201).json({
 			message: `card ${cardId} is played`,
 			cardId: cardId,
 			rotate: rotate,
+			color: fetchedCard.color,
+			value: fetchedCard.value,
+			nextPlayerId: userIdList[updatedPlayerTurn].user_id,
+			playedBy: userId,
+			userIdList: userIdList,
 		});
 	} catch (err) {
 		next(err);

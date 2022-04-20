@@ -75,8 +75,17 @@ if (userCards && gameId) {
 
 			if (body.status && body.status == 1001) return;
 
+			socket.emit('play card', {
+				id: body.cardId,
+				color: body.color,
+				value: body.value,
+				rotate: body.rotate,
+				nextPlayerId: body.nextPlayerId,
+				playedBy: body.playedBy,
+				userIdList: body.userIdList,
+			});
+
 			const card = document.getElementById(cardId);
-			console.log(card);
 			createNewDiscardedCard(card.className, cardId, body.rotate);
 			// const newDiscarded = document.createElement('div');
 			// newDiscarded.setAttribute('class', card.className);
@@ -91,7 +100,7 @@ if (userCards && gameId) {
 
 			// remove your turn notice
 			const yourTurn = document.getElementById('your-turn');
-			yourTurn.remove();
+			if (yourTurn) yourTurn.remove();
 			updateBoard();
 		});
 	}
@@ -126,34 +135,36 @@ socket.on('start game', data => {
 
 socket.on('play card', async data => {
 	console.log(data);
-	const className = `card ${data.color}-${data.value}`;
-	createNewDiscardedCard(className, data.id, data.rotate);
+	if (Object.keys(data).length > 0) {
+		const className = `card ${data.color}-${data.value}`;
+		createNewDiscardedCard(className, data.id, data.rotate);
 
-	const result = await fetch('/userInfo');
-	const body = await result.json();
-	console.log(body);
+		const result = await fetch('/userInfo');
+		const body = await result.json();
+		console.log(body);
 
-	if (data.nextPlayerId === body.uid) {
-		const yourTurnElm = document.createElement('h1');
-		yourTurnElm.innerText = 'Your turn';
-		yourTurnElm.id = 'your-turn';
-		gameRoomDiv.appendChild(yourTurnElm);
-	}
-	console.log(data.userIdList);
-
-	if (data.playedBy !== body.uid) {
-		const userIndex = data.userIdList.findIndex(
-			uid => uid.user_id === body.uid
-		);
-		console.log('user index is: ', userIndex);
-
-		const p1 = document.getElementById('p1');
-		if (data.userIdList.length == 2) {
-			p1.removeChild(p1.children[p1.children.length - 1]);
+		if (data.nextPlayerId === body.uid) {
+			const yourTurnElm = document.createElement('h1');
+			yourTurnElm.innerText = 'Your turn';
+			yourTurnElm.id = 'your-turn';
+			gameRoomDiv.appendChild(yourTurnElm);
 		}
-	}
+		console.log(data.userIdList);
 
-	updateBoard();
+		if (data.playedBy !== body.uid) {
+			const userIndex = data.userIdList.findIndex(
+				uid => uid.user_id === body.uid
+			);
+			console.log('user index is: ', userIndex);
+
+			const p1 = document.getElementById('p1');
+			if (data.userIdList.length == 2) {
+				p1.removeChild(p1.children[p1.children.length - 1]);
+			}
+		}
+
+		updateBoard();
+	}
 });
 
 updateBoard();
