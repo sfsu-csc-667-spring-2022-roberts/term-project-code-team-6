@@ -44,7 +44,7 @@ function updateBoard() {
 
 const userCards = document.getElementById('user-cards');
 const game = document.getElementsByClassName('game');
-const gameId = game ? game[0].id : null;
+const gameId = game.length > 0 ? game[0].id : null;
 
 const startBtn = document.getElementById('start-game');
 if (startBtn && gameId) {

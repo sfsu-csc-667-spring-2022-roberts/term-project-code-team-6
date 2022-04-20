@@ -1,9 +1,14 @@
-const socketio = require('socket.io');
-const socket = socketio();
+const io = require('socket.io')();
+const socketapi = {
+	io: io,
+};
 
-
-socket.on("connection", (socket) => {
-    
+io.on('connection', function (socket) {
+	console.log('A user connected');
+	socket.on('disconnect', () => {
+		io.emit('chat message', 'Someone disconnected!');
+		console.log('user disconnected');
+	});
 });
 
-module.exports = socket;
+module.exports = socketapi;
