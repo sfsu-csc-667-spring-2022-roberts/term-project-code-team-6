@@ -3,6 +3,7 @@ const router = express.Router();
 const authUser = require('../middleware/isAuth');
 const { body, validationResult } = require('express-validator');
 const db = require('../db');
+let socketapi = require('../sockets');
 
 // Create Game
 router.post(
@@ -148,6 +149,12 @@ router.get('/:id', authUser, async (req, res, next) => {
 				// update game user count
 				query = 'UPDATE games SET "userCount" = $1 WHERE id = $2;';
 				await db.any(query, [updatedUserCount, fetchedGame.id]);
+
+				// get username
+				query = 'SELECT username FROM users WHERE id = $1;';
+				const { username } = await db.one(query, [userId]);
+
+				socketapi.io.emit('join room', { uid: userId, username: username });
 			} else {
 				console.log('observers');
 			}
@@ -267,12 +274,10 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		if (userIndex === fetchedGame.player_turn) {
 			console.log("In user's turn");
 		} else {
-			return res
-				.status(200)
-				.json({
-					message: "Cannot not play cards in other user's turn",
-					status: 1001,
-				});
+			return res.status(200).json({
+				message: "Cannot not play cards in other user's turn",
+				status: 1001,
+			});
 		}
 
 		query =

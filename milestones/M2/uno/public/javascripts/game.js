@@ -42,6 +42,7 @@ function updateBoard() {
 	}
 }
 
+
 const userCards = document.getElementById('user-cards');
 const game = document.getElementsByClassName('game');
 const gameId = game.length > 0 ? game[0].id : null;
@@ -83,5 +84,14 @@ if (userCards && gameId) {
 		});
 	}
 }
+
+socket.on('join room', data => {
+	console.log(data)
+	// var item = document.createElement('li');
+	// item.textContent = msg;
+	// messages.appendChild(item);
+	// window.scrollTo(0, document.body.scrollHeight);
+});
+
 
 updateBoard();
