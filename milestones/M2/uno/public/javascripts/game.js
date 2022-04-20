@@ -54,6 +54,15 @@ if (startBtn && gameId) {
 	});
 }
 
+const discardedContainer = document.getElementById('discarded-cards_container');
+function createNewDiscardedCard(className, cardId, rotate) {
+	const newDiscarded = document.createElement('div');
+	newDiscarded.setAttribute('class', className);
+	newDiscarded.setAttribute('id', cardId);
+	newDiscarded.style.transform = `rotate(${rotate}deg)`;
+	discardedContainer.appendChild(newDiscarded);
+}
+
 if (userCards && gameId) {
 	for (card of userCards.children) {
 		let cardId = card.id;
@@ -68,14 +77,16 @@ if (userCards && gameId) {
 
 			const card = document.getElementById(cardId);
 			console.log(card);
-			const newDiscarded = document.createElement('div');
-			newDiscarded.setAttribute('class', card.className);
-			newDiscarded.setAttribute('id', cardId);
-			newDiscarded.style.transform = `rotate(${body.rotate}deg)`;
-			const discardedContainer = document.getElementsByClassName(
-				'discarded-cards_container'
-			);
-			discardedContainer[0].appendChild(newDiscarded);
+			createNewDiscardedCard(card.className, cardId, body.rotate);
+			// const newDiscarded = document.createElement('div');
+			// newDiscarded.setAttribute('class', card.className);
+			// newDiscarded.setAttribute('id', cardId);
+			// newDiscarded.style.transform = `rotate(${body.rotate}deg)`;
+			// const discardedContainer = document.getElementById(
+			// 	'discarded-cards_container'
+			// );
+			// discardedContainer.appendChild(newDiscarded);
+
 			card.remove();
 
 			// remove your turn notice
@@ -105,10 +116,24 @@ socket.on('join room', data => {
 	userCount.innerText = `${data.userCount} playing`;
 
 	gameRoomDiv.appendChild(newLobbyUser);
-	// var item = document.createElement('li');
-	// item.textContent = msg;
-	// messages.appendChild(item);
-	// window.scrollTo(0, document.body.scrollHeight);
+});
+
+socket.on('start game', data => {
+	// Don't know why if reload is trigged at the same time
+	// users all get the same cards
+	setTimeout(
+		() => window.location.reload(),
+		Math.floor(Math.random() * 100)
+	);
+});
+
+socket.on('play card', data => {
+	console.log(data);
+	const className = `card ${data.color}-${data.value}`;
+	createNewDiscardedCard(className, data.id, data.rotate);
+	// if ()
+	// window.location.reload();
+	updateBoard();
 });
 
 updateBoard();
