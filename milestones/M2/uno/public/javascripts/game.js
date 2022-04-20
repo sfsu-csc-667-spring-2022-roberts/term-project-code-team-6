@@ -121,18 +121,16 @@ socket.on('join room', data => {
 socket.on('start game', data => {
 	// Don't know why if reload is trigged at the same time
 	// users all get the same cards
-	setTimeout(
-		() => window.location.reload(),
-		Math.floor(Math.random() * 100)
-	);
+	setTimeout(() => window.location.reload(), Math.floor(Math.random() * 100));
 });
 
-socket.on('play card', data => {
+socket.on('play card', async data => {
 	console.log(data);
 	const className = `card ${data.color}-${data.value}`;
 	createNewDiscardedCard(className, data.id, data.rotate);
-	// if ()
-	// window.location.reload();
+	const result = await fetch('/userInfo');
+	const body = await result.json();
+	console.log(body);
 	updateBoard();
 });
 
