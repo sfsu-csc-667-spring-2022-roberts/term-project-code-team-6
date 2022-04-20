@@ -78,6 +78,8 @@ router.get('/:id', authUser, async (req, res, next) => {
 				return res.redirect('/');
 			}
 
+			// await new Promise(r => setTimeout(r, Math.floor(Math.random() * 1000 + 1000)));
+
 			query =
 				'SELECT id, color, value FROM game_cards\
 				JOIN cards ON card_id = cards.id\
@@ -154,7 +156,11 @@ router.get('/:id', authUser, async (req, res, next) => {
 				query = 'SELECT username FROM users WHERE id = $1;';
 				const { username } = await db.one(query, [userId]);
 
-				socketapi.io.emit('join room', { uid: userId, username: username, userCount: updatedUserCount });
+				socketapi.io.emit('join room', {
+					uid: userId,
+					username: username,
+					userCount: updatedUserCount,
+				});
 			} else {
 				console.log('observers');
 			}
@@ -165,7 +171,7 @@ router.get('/:id', authUser, async (req, res, next) => {
 					WHERE game_id = $1';
 			const players = await db.manyOrNone(query, fetchedGame.id);
 			console.log('Players are: ', players);
-			console.log('Updated user count', fetchedGame.userCount)
+			console.log('Updated user count', fetchedGame.userCount);
 
 			res.render('game', {
 				players: players,
@@ -238,8 +244,10 @@ router.post('/:id/start', authUser, async (req, res, next) => {
 			end = end + INITIAL_CARD_COUNT;
 		}
 
+		socketapi.io.emit('start game', { message: 'Game started' });
+
 		// Redirect to /game/{id}
-		res.redirect('/game/' + gameId);
+		// res.redirect('/game/' + gameId);
 	} catch (err) {
 		next(err);
 	}
@@ -318,6 +326,17 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 			console.log(`player ${userId} wins`);
 			return res.status(201).json({ message: `player ${userId} wins` });
 		}
+
+		query = 'SELECT *\
+		FROM cards\
+		WHERE id = $1';
+		const fetchedCard = await db.one(query, [cardId]);
+		fetchedCard.rotate = rotate;
+		fetchedCard.nextPlayer = userIdList[updatedPlayerTurn];
+		fetchedCard.playedBy = userId;
+		console.log('next player is: ', fetchedCard.nextPlayer);
+
+		socketapi.io.emit('play card', fetchedCard);
 
 		res.status(201).json({
 			message: `card ${cardId} is played`,
