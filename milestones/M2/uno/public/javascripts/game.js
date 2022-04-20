@@ -42,7 +42,6 @@ function updateBoard() {
 	}
 }
 
-
 const userCards = document.getElementById('user-cards');
 const game = document.getElementsByClassName('game');
 const gameId = game.length > 0 ? game[0].id : null;
@@ -64,7 +63,9 @@ if (userCards && gameId) {
 			});
 			const body = await result.json();
 			console.log(body);
+
 			if (body.status && body.status == 1001) return;
+
 			const card = document.getElementById(cardId);
 			console.log(card);
 			const newDiscarded = document.createElement('div');
@@ -85,13 +86,29 @@ if (userCards && gameId) {
 	}
 }
 
+const gameRoomDiv = document.getElementById('game-room');
+const userCount = document.getElementById('user-count');
+
 socket.on('join room', data => {
-	console.log(data)
+	console.log(data);
+	const newLobbyUser = document.createElement('div');
+	const uid = document.createElement('p');
+	const username = document.createElement('p');
+	const ready = document.createElement('p');
+	uid.innerText = `uid: ${data.uid}`;
+	username.innerText = `username: ${data.username}`;
+	ready.innerText = 'false';
+	newLobbyUser.appendChild(uid);
+	newLobbyUser.appendChild(username);
+	newLobbyUser.appendChild(ready);
+	newLobbyUser.className = 'game-lobby_user';
+	userCount.innerText = `${data.userCount} playing`;
+
+	gameRoomDiv.appendChild(newLobbyUser);
 	// var item = document.createElement('li');
 	// item.textContent = msg;
 	// messages.appendChild(item);
 	// window.scrollTo(0, document.body.scrollHeight);
 });
-
 
 updateBoard();

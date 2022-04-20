@@ -141,7 +141,7 @@ router.get('/:id', authUser, async (req, res, next) => {
 			// add user if the user is not in the game and the game has less than 4 players
 			else if (fetchedGame.userCount < 4) {
 				console.log('current user count', fetchedGame.userCount);
-				let updatedUserCount = fetchedGame.userCount + 1;
+				let updatedUserCount = ++fetchedGame.userCount;
 				query =
 					'INSERT INTO game_users(game_id, user_id, player_order) VALUES ($1, $2, $3);';
 				await db.any(query, [fetchedGame.id, userId, updatedUserCount]);
@@ -154,7 +154,7 @@ router.get('/:id', authUser, async (req, res, next) => {
 				query = 'SELECT username FROM users WHERE id = $1;';
 				const { username } = await db.one(query, [userId]);
 
-				socketapi.io.emit('join room', { uid: userId, username: username });
+				socketapi.io.emit('join room', { uid: userId, username: username, userCount: updatedUserCount });
 			} else {
 				console.log('observers');
 			}
@@ -165,6 +165,7 @@ router.get('/:id', authUser, async (req, res, next) => {
 					WHERE game_id = $1';
 			const players = await db.manyOrNone(query, fetchedGame.id);
 			console.log('Players are: ', players);
+			console.log('Updated user count', fetchedGame.userCount)
 
 			res.render('game', {
 				players: players,

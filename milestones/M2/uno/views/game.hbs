@@ -1,12 +1,12 @@
 <link rel='stylesheet' href='../stylesheets/cardstyle.css' />
 <div class='landing-top'>
-	<p>{{userCount}} playing</p>
+	<p id="user-count" >{{userCount}} playing</p>
 	{{#unless active}}
 		<button id='start-game' class='secondary-btn'>Start</button>
 	{{/unless}}
 </div>
 <div id={{gameId}} class='game'>
-		<div class='game-room'>
+		<div id="game-room" class='game-room'>
 			{{#if active}}
 					<div class='hand player-one'>
 						{{#each playerCards.p1}}
