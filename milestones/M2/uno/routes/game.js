@@ -229,14 +229,12 @@ router.post('/:id/start', authUser, async (req, res, next) => {
 		const { userCount } = await db.one(query, [gameId]);
 		console.log('Current player count is: ', userCount);
 
-		// if (userCount < 2) {
-		// 	return res
-		// 		.status(400)
-		// 		.json({
-		// 			status: -1,
-		// 			message: 'Must have at least 2 players to start the game',
-		// 		});
-		// }
+		if (userCount < 2) {
+			return res.status(400).json({
+				status: 1001,
+				message: 'Must have at least 2 players to start the game',
+			});
+		}
 
 		// Set game to active
 		query = 'UPDATE games SET active = true WHERE id = $1;';
@@ -284,6 +282,7 @@ router.post('/:id/start', authUser, async (req, res, next) => {
 	}
 });
 
+// Play a card
 router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 	try {
 		const gameId = req.params.id;
@@ -311,14 +310,13 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		console.log('Game info: ', fetchedGame);
 		console.log('Total discarded cards: ', fetchedGame.discardedCount);
 
-		if (userIndex === fetchedGame.player_turn) {
-			console.log("In user's turn");
-		} else {
+		if (userIndex !== fetchedGame.player_turn) {
 			return res.status(200).json({
 				message: "Cannot not play cards in other user's turn",
 				status: 1001,
 			});
 		}
+		console.log("In user's turn");
 
 		query =
 			'UPDATE game_cards\
