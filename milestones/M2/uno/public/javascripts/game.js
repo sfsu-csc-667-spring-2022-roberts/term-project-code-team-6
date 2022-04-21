@@ -77,8 +77,15 @@ if (userCards && gameId) {
 
 			if (body.status && body.status == 1001) return;
 
+			if (body.status && body.status == 1002) {
+				// To do - add ui
+				console.log('You win');
+				return;
+			}
+
 			socket.emit('play card', {
 				id: body.cardId,
+				gameId: gameId,
 				color: body.color,
 				value: body.value,
 				rotate: body.rotate,
@@ -139,36 +146,34 @@ socket.on('start game', data => {
 
 socket.on('play card', async data => {
 	console.log(data);
-	if (Object.keys(data).length > 0) {
-		const className = `card ${data.color}-${data.value}`;
-		createNewDiscardedCard(className, data.id, data.rotate);
+	const className = `card ${data.color}-${data.value}`;
+	createNewDiscardedCard(className, data.id, data.rotate);
 
-		const result = await fetch('/userInfo');
-		const body = await result.json();
-		console.log(body);
+	const result = await fetch('/userInfo');
+	const body = await result.json();
+	console.log(body);
 
-		if (data.nextPlayerId === body.uid) {
-			const yourTurnElm = document.createElement('h1');
-			yourTurnElm.innerText = 'Your turn';
-			yourTurnElm.id = 'your-turn';
-			gameRoomDiv.appendChild(yourTurnElm);
-		}
-		console.log(data.userIdList);
-
-		if (data.playedBy !== body.uid) {
-			const userIndex = data.userIdList.findIndex(
-				uid => uid.user_id === body.uid
-			);
-			console.log('user index is: ', userIndex);
-
-			const p1 = document.getElementById('p1');
-			if (data.userIdList.length == 2) {
-				p1.removeChild(p1.children[p1.children.length - 1]);
-			}
-		}
-
-		updateBoard();
+	if (data.nextPlayerId === body.uid) {
+		const yourTurnElm = document.createElement('h1');
+		yourTurnElm.innerText = 'Your turn';
+		yourTurnElm.id = 'your-turn';
+		gameRoomDiv.appendChild(yourTurnElm);
 	}
+	console.log(data.userIdList);
+
+	if (data.playedBy !== body.uid) {
+		const userIndex = data.userIdList.findIndex(
+			uid => uid.user_id === body.uid
+		);
+		console.log('user index is: ', userIndex);
+
+		const p1 = document.getElementById('p1');
+		if (data.userIdList.length == 2) {
+			p1.removeChild(p1.children[p1.children.length - 1]);
+		}
+	}
+
+	updateBoard();
 });
 
 // socket.on win => remove card listener so user can not play cards

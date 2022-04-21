@@ -327,7 +327,9 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		console.log('current hand count: ', count);
 		if (count == 0) {
 			console.log(`player ${userId} wins`);
-			return res.status(201).json({ message: `player ${userId} wins` });
+			return res
+				.status(200)
+				.json({ message: `player ${userId} wins`, status: 1002 });
 		}
 
 		query = 'SELECT *\

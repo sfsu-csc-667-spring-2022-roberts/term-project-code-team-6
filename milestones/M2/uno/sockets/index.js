@@ -12,7 +12,15 @@ io.on('connection', function (socket) {
 	});
 
 	socket.on('play card', data => {
-		socket.broadcast.emit('play card', data);
+		if (data.gameId)
+			socket.broadcast.to('room' + data.gameId).emit('play card', data);
+	});
+
+	socket.on('join room', data => {
+		if (data.gameId) {
+			console.log('join room ', data.gameId);
+			socket.join('room' + data.gameId);
+		}
 	});
 });
 
