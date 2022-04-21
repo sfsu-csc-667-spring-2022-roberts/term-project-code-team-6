@@ -128,7 +128,23 @@ router.get('/:id', authUser, async (req, res, next) => {
 				const p2CardCountObj = await db.one(query, [gameId, p1Id]);
 				playerCards.p2 = new Array(+p2CardCountObj.count).fill(0);
 			} else {
-				console.log('to-do');
+				const p1Index = (userIndex + 2) % userIdList.length;
+				const p1Id = userIdList[p1Index].user_id;
+
+				const p1CardCountObj = await db.one(query, [gameId, p1Id]);
+				playerCards.p1 = new Array(+p1CardCountObj.count).fill(0);
+
+				const p2Index = (userIndex + 3) % userIdList.length;
+				const p2Id = userIdList[p2Index].user_id;
+
+				const p2CardCountObj = await db.one(query, [gameId, p2Id]);
+				playerCards.p2 = new Array(+p2CardCountObj.count).fill(0);
+
+				const p3Index = (userIndex + 1) % userIdList.length;
+				const p3Id = userIdList[p3Index].user_id;
+
+				const p3CardCountObj = await db.one(query, [gameId, p3Id]);
+				playerCards.p3 = new Array(+p3CardCountObj.count).fill(0);
 			}
 
 			playerCards.user = userCards;

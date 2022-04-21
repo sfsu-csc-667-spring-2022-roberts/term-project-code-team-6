@@ -135,7 +135,7 @@ socket.on('join game', data => {
 socket.on('start game', data => {
 	// Don't know why if reload is trigged at the same time
 	// users all get the same cards
-	setTimeout(() => window.location.reload(), Math.floor(Math.random() * 100));
+	setTimeout(() => window.location.reload(), Math.floor(Math.random() * 1000));
 });
 
 socket.on('play card', async data => {
@@ -169,15 +169,25 @@ socket.on('play card', async data => {
 
 		const p1 = document.getElementById('p1');
 		const p2 = document.getElementById('p2');
-		const p3 = document.getElementById('p2');
+		const p3 = document.getElementById('p3');
 
 		if (data.userIdList.length == 2) {
 			p1.removeChild(p1.children[p1.children.length - 1]);
-		}
-		if (data.userIdList.length == 3) {
+		} else if (data.userIdList.length == 3) {
 			(userIndex + 1) % data.userIdList.length === previousPlayerIndex
 				? p1.removeChild(p1.children[p1.children.length - 1])
 				: p2.removeChild(p2.children[p2.children.length - 1]);
+		} else {
+			if ((userIndex + 1) % data.userIdList.length === previousPlayerIndex) {
+				p3.removeChild(p3.children[p3.children.length - 1]);
+			} else if (
+				(userIndex + 2) % data.userIdList.length ===
+				previousPlayerIndex
+			) {
+				p1.removeChild(p1.children[p1.children.length - 1]);
+			} else {
+				p2.removeChild(p2.children[p2.children.length - 1]);
+			}
 		}
 	}
 
