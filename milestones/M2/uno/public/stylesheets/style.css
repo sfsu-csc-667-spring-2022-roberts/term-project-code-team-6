@@ -136,6 +136,7 @@ a {
 .chat {
 	flex: 1;
 	height: 70vh;
+	min-width: 300px;
 	border: 1px solid gray;
 	border-radius: 3px;
 	display: flex;
@@ -145,6 +146,9 @@ a {
 .chat-msg {
 	flex: 1;
 	padding: 1rem;
+	overflow: hidden;
+	overflow-y: scroll;
+	text-overflow: 'wrap';
 }
 
 .chat-container {
