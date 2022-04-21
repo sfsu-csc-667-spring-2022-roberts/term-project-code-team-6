@@ -18,9 +18,7 @@ io.on('connection', function (socket) {
 
 	socket.on('chat message', data => {
 		console.log('socket chat message: ', data);
-		socket.broadcast
-			.to(data.destination)
-			.emit('chat message', { message: data.message, username: data.username });
+		socket.broadcast.to(data.destination).emit('chat message', data);
 	});
 
 	socket.on('join room', data => {

@@ -29,8 +29,9 @@ form.addEventListener('submit', async function (e) {
 		const result = await fetch('/userInfo');
 		const body = await result.json();
 		console.log(body);
+		const destination = gameId ? 'room' + gameId : 'lobby';
 		socket.emit('chat message', {
-			destination: 'room' + gameId,
+			destination: destination,
 			username: body.username,
 			message: input.value,
 		});
@@ -53,7 +54,9 @@ form.addEventListener('submit', async function (e) {
 
 socket.on('chat message', data => {
 	console.log('on chat message');
-	createChatDiv(data.username, data.message);
+	console.log(data);
+	if (data.destination !== 'lobby' || !gameId)
+		createChatDiv(data.username, data.message);
 
 	// const chatDiv = document.createElement('div');
 	// const chatUsername = document.createElement('span');
