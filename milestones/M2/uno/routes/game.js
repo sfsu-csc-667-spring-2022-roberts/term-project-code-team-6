@@ -78,8 +78,6 @@ router.get('/:id', authUser, async (req, res, next) => {
 				return res.redirect('/');
 			}
 
-			// await new Promise(r => setTimeout(r, Math.floor(Math.random() * 1000 + 1000)));
-
 			query =
 				'SELECT id, color, value FROM game_cards\
 				JOIN cards ON card_id = cards.id\
@@ -114,7 +112,21 @@ router.get('/:id', authUser, async (req, res, next) => {
 				const p1CardCountObj = await db.one(query, [gameId, p1Id]);
 				playerCards.p1 = new Array(+p1CardCountObj.count).fill(0);
 			} else if (userIdList.length == 3) {
-				console.log('to-do');
+				const p1Index = (userIndex + 1) % userIdList.length;
+				console.log('p1 index is at: ', p1Index);
+				const p1Id = userIdList[p1Index].user_id;
+				console.log('p1Id: ', p1Id);
+
+				const p1CardCountObj = await db.one(query, [gameId, p1Id]);
+				playerCards.p1 = new Array(+p1CardCountObj.count).fill(0);
+
+				const p2Index = (userIndex + 2) % userIdList.length;
+				console.log('p1 index is at: ', p2Index);
+				const p2Id = userIdList[p2Index].user_id;
+				console.log('p2Id: ', p2Id);
+
+				const p2CardCountObj = await db.one(query, [gameId, p1Id]);
+				playerCards.p2 = new Array(+p2CardCountObj.count).fill(0);
 			} else {
 				console.log('to-do');
 			}
