@@ -1,16 +1,52 @@
-const pathArray = window.location.pathname.split('/');
-const gameId =
-	pathArray.length === 3 && pathArray[1] === 'game' ? pathArray[2] : null;
+console.log(gameId);
 
-var messages = document.getElementById('chat-msg');
+const messages = document.getElementById('chat-msg');
+console.log(messages);
 
 // Emittine Events
-var form = document.getElementById('chat-box');
-var input = document.getElementById('chat-inpu');
+const form = document.getElementById('chat-box');
+const input = document.getElementById('chat-input');
 
-form.addEventListener('submit', function (e) {
+console.log(form);
+console.log(input);
+
+form.addEventListener('submit', async function (e) {
 	e.preventDefault();
+	console.log(input.value);
 	if (input.value) {
-		socket.emit('chat message', input.value);
+		const result = await fetch('/userInfo');
+		const body = await result.json();
+		console.log(body);
+		socket.emit('chat message', {
+			destination: 'room' + gameId,
+			username: body.username,
+			message: input.value,
+		});
+
+		const chatDiv = document.createElement('div');
+		const chatUsername = document.createElement('span');
+		const chatMsg = document.createElement('span');
+		chatUsername.innerText = body.username + ': ';
+		chatMsg.innerText = input.value;
+		chatDiv.appendChild(chatUsername);
+		chatDiv.className = 'chat-container';
+		chatDiv.appendChild(chatMsg);
+		messages.appendChild(chatDiv);
+
+		input.value = '';
 	}
+});
+
+socket.on('chat message', data => {
+	console.log('on chat message');
+	const chatDiv = document.createElement('div');
+	const chatUsername = document.createElement('span');
+	const chatMsg = document.createElement('span');
+
+	chatUsername.innerText = data.username + ': ';
+	chatMsg.innerText = data.message;
+	chatDiv.appendChild(chatUsername);
+	chatDiv.className = 'chat-container';
+	chatDiv.appendChild(chatMsg);
+	messages.appendChild(chatDiv);
 });

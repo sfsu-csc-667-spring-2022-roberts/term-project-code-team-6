@@ -34,7 +34,7 @@ router.get('/terms&conditions', function (req, res, next) {
 router.get('/userInfo', isAuth, async function (req, res, next) {
 	const userId = req.session.userId;
 	let query = 'SELECT username FROM users WHERE id = $1';
-	const fetchedUser = await db.manyOrNone(query, [userId]);
+	const fetchedUser = await db.one(query, [userId]);
 	console.log(fetchedUser);
 	res
 		.status(200)

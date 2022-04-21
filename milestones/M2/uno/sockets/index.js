@@ -5,7 +5,7 @@ const socketApi = {
 
 io.on('connection', function (socket) {
 	console.log('A user connected');
-
+	socket.join('lobby');
 	socket.on('disconnect', () => {
 		// io.emit('chat message', 'Someone disconnected!');
 		console.log('user disconnected');
@@ -14,6 +14,13 @@ io.on('connection', function (socket) {
 	socket.on('play card', data => {
 		if (data.gameId)
 			socket.broadcast.to('room' + data.gameId).emit('play card', data);
+	});
+
+	socket.on('chat message', data => {
+		console.log('socket chat message: ', data);
+		socket.broadcast
+			.to(data.destination)
+			.emit('chat message', { message: data.message, username: data.username });
 	});
 
 	socket.on('join room', data => {
