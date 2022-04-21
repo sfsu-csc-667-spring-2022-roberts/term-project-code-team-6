@@ -43,10 +43,12 @@ function updateBoard() {
 }
 
 const userCards = document.getElementById('user-cards');
+const pathArray = window.location.pathname.split('/');
 const game = document.getElementsByClassName('game');
-const gameId = game.length > 0 ? game[0].id : null;
+const gameId =
+	pathArray.length === 3 && pathArray[1] === 'game' ? pathArray[2] : null;
 
-socket.emit('join room', { gameId: gameId });
+if (gameId) socket.emit('join room', { gameId: gameId });
 
 const startBtn = document.getElementById('start-game');
 if (startBtn && gameId) {
@@ -96,14 +98,6 @@ if (userCards && gameId) {
 
 			const card = document.getElementById(cardId);
 			createNewDiscardedCard(card.className, cardId, body.rotate);
-			// const newDiscarded = document.createElement('div');
-			// newDiscarded.setAttribute('class', card.className);
-			// newDiscarded.setAttribute('id', cardId);
-			// newDiscarded.style.transform = `rotate(${body.rotate}deg)`;
-			// const discardedContainer = document.getElementById(
-			// 	'discarded-cards_container'
-			// );
-			// discardedContainer.appendChild(newDiscarded);
 
 			card.remove();
 
