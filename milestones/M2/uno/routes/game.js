@@ -220,7 +220,6 @@ router.get('/:id', authUser, async (req, res, next) => {
 router.post('/:id/start', authUser, async (req, res, next) => {
 	try {
 		const gameId = req.params.id;
-		console.log(gameId);
 
 		// Check if room has more than 1 player
 		let query = 'SELECT "userCount"\
@@ -291,7 +290,7 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		console.log('gameId is: ', gameId);
 		console.log('cardId is: ', cardId);
 
-		// check if player has that card
+		// to-do check if player has that card
 
 		let query =
 			'SELECT user_id\
@@ -318,6 +317,23 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		}
 		console.log("In user's turn");
 
+		query = 'SELECT *\
+		FROM cards\
+		WHERE id = $1';
+		const fetchedCard = await db.one(query, [cardId]);
+		console.log('Card info: ', fetchedCard);
+		// Check color
+		if (
+			fetchedGame.curr_color !== 'wild' &&
+			fetchedCard.color !== 'wild' &&
+			fetchedGame.curr_color !== fetchedCard.color
+		) {
+			return res.status(200).json({
+				message: 'Color mismatch',
+				status: 1002,
+			});
+		}
+
 		query =
 			'UPDATE game_cards\
 			SET user_id = null, discarded = true, "order" = $1, rotate = $2\
@@ -335,11 +351,12 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		console.log('updated player turn: ', updatedPlayerTurn);
 		query =
 			'UPDATE games\
-				SET "discardedCount" = $1, player_turn = $2\
-				WHERE id = $3;';
+				SET "discardedCount" = $1, player_turn = $2, curr_color = $3\
+				WHERE id = $4;';
 		await db.any(query, [
 			fetchedGame.discardedCount + 1,
 			updatedPlayerTurn,
+			fetchedCard.color,
 			gameId,
 		]);
 
@@ -347,42 +364,16 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 			'SELECT COUNT(*)\
 			FROM game_cards\
 			WHERE game_id = $1 AND user_id = $2';
-
 		const { count } = await db.one(query, [gameId, userId]);
 
 		query = 'SELECT username\
 			FROM users\
 			WHERE id = $1 ';
-
 		const { username } = await db.one(query, [userId]);
+
 		// win condition met, brodcast this message
 		console.log('current hand count: ', count);
-		// if (count == 0) {
-		// 	console.log(`player ${userId} wins`);
-		// 	return res
-		// 		.status(200)
-		// 		.json({ message: `player ${userId} wins`, status: 1002 });
-		// }
-
-		query = 'SELECT *\
-		FROM cards\
-		WHERE id = $1';
-		const fetchedCard = await db.one(query, [cardId]);
 		console.log('next player is: ', userIdList[updatedPlayerTurn].user_id);
-
-		// console.log('broadcast is: ', socketApi.io.broadcast);
-		// socketApi.io.on('play card', socket => {
-		// 	console.log('socket play card');
-		// 	socket.broadcast.emit('play card', {
-		// 		id: fetchedCard.id,
-		// 		color: fetchedCard.color,
-		// 		value: fetchedCard.value,
-		// 		rotate: rotate,
-		// 		nextPlayerId: userIdList[updatedPlayerTurn].user_id,
-		// 		playedBy: userId,
-		// 		userIdList: userIdList,
-		// 	});
-		// });
 
 		res.status(201).json({
 			message: `card ${cardId} is played`,

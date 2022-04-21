@@ -77,7 +77,13 @@ if (userCards && gameId) {
 			const body = await result.json();
 			console.log(body);
 
-			if (body.status && body.status == 1001) return;
+			if (
+				body.status &&
+				(body.status == 1001 || body.status == 1002 || body.status == 1003)
+			) {
+				console.log(body.message);
+				return;
+			}
 
 			const card = document.getElementById(cardId);
 			createNewDiscardedCard(card.className, cardId, body.rotate);
