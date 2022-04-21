@@ -79,6 +79,16 @@ if (userCards && gameId) {
 
 			if (body.status && body.status == 1001) return;
 
+			const card = document.getElementById(cardId);
+			createNewDiscardedCard(card.className, cardId, body.rotate);
+
+			card.remove();
+
+			// remove your turn notice
+			const yourTurn = document.getElementById('your-turn');
+			if (yourTurn) yourTurn.remove();
+			updateBoard();
+
 			if (body.status && body.status == 1002) {
 				// To do - add ui
 				console.log('You win');
@@ -95,16 +105,6 @@ if (userCards && gameId) {
 				playedBy: body.playedBy,
 				userIdList: body.userIdList,
 			});
-
-			const card = document.getElementById(cardId);
-			createNewDiscardedCard(card.className, cardId, body.rotate);
-
-			card.remove();
-
-			// remove your turn notice
-			const yourTurn = document.getElementById('your-turn');
-			if (yourTurn) yourTurn.remove();
-			updateBoard();
 		});
 	}
 }
@@ -161,9 +161,23 @@ socket.on('play card', async data => {
 		);
 		console.log('user index is: ', userIndex);
 
+		const previousPlayerIndex = data.userIdList.findIndex(
+			uid => uid.user_id === data.playedBy
+		);
+
+		console.log('previous player index: ', previousPlayerIndex);
+
 		const p1 = document.getElementById('p1');
+		const p2 = document.getElementById('p2');
+		const p3 = document.getElementById('p2');
+
 		if (data.userIdList.length == 2) {
 			p1.removeChild(p1.children[p1.children.length - 1]);
+		}
+		if (data.userIdList.length == 3) {
+			(userIndex + 1) % data.userIdList.length === previousPlayerIndex
+				? p1.removeChild(p1.children[p1.children.length - 1])
+				: p2.removeChild(p2.children[p2.children.length - 1]);
 		}
 	}
 
