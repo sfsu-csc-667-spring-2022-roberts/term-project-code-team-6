@@ -10,6 +10,18 @@ const input = document.getElementById('chat-input');
 console.log(form);
 console.log(input);
 
+function createChatDiv(username, message) {
+	const chatDiv = document.createElement('div');
+	const chatUsername = document.createElement('span');
+	const chatMsg = document.createElement('p');
+	chatUsername.innerText = username + ': ';
+	chatMsg.innerText = message;
+	chatDiv.appendChild(chatUsername);
+	chatDiv.className = 'chat-container';
+	chatDiv.appendChild(chatMsg);
+	messages.appendChild(chatDiv);
+}
+
 form.addEventListener('submit', async function (e) {
 	e.preventDefault();
 	console.log(input.value);
@@ -23,15 +35,17 @@ form.addEventListener('submit', async function (e) {
 			message: input.value,
 		});
 
-		const chatDiv = document.createElement('div');
-		const chatUsername = document.createElement('span');
-		const chatMsg = document.createElement('span');
-		chatUsername.innerText = body.username + ': ';
-		chatMsg.innerText = input.value;
-		chatDiv.appendChild(chatUsername);
-		chatDiv.className = 'chat-container';
-		chatDiv.appendChild(chatMsg);
-		messages.appendChild(chatDiv);
+		// const chatDiv = document.createElement('div');
+		// const chatUsername = document.createElement('span');
+		// const chatMsg = document.createElement('p');
+		// chatUsername.innerText = body.username + ': ';
+		// chatMsg.innerText = input.value;
+		// chatDiv.appendChild(chatUsername);
+		// chatDiv.className = 'chat-container';
+		// chatDiv.appendChild(chatMsg);
+		// messages.appendChild(chatDiv);
+
+		createChatDiv(body.username, input.value);
 
 		input.value = '';
 	}
@@ -39,14 +53,16 @@ form.addEventListener('submit', async function (e) {
 
 socket.on('chat message', data => {
 	console.log('on chat message');
-	const chatDiv = document.createElement('div');
-	const chatUsername = document.createElement('span');
-	const chatMsg = document.createElement('span');
+	createChatDiv(data.username, data.message);
 
-	chatUsername.innerText = data.username + ': ';
-	chatMsg.innerText = data.message;
-	chatDiv.appendChild(chatUsername);
-	chatDiv.className = 'chat-container';
-	chatDiv.appendChild(chatMsg);
-	messages.appendChild(chatDiv);
+	// const chatDiv = document.createElement('div');
+	// const chatUsername = document.createElement('span');
+	// const chatMsg = document.createElement('p');
+
+	// chatUsername.innerText = data.username + ': ';
+	// chatMsg.innerText = data.message;
+	// chatDiv.appendChild(chatUsername);
+	// chatDiv.className = 'chat-container';
+	// chatDiv.appendChild(chatMsg);
+	// messages.appendChild(chatDiv);
 });
