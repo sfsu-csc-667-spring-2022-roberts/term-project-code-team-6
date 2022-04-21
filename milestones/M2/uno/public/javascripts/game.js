@@ -89,10 +89,9 @@ if (userCards && gameId) {
 			if (yourTurn) yourTurn.remove();
 			updateBoard();
 
-			if (body.status && body.status == 1002) {
+			if (body.youWin) {
 				// To do - add ui
 				console.log('You win');
-				return;
 			}
 
 			socket.emit('play card', {
@@ -104,6 +103,7 @@ if (userCards && gameId) {
 				nextPlayerId: body.nextPlayerId,
 				playedBy: body.playedBy,
 				userIdList: body.userIdList,
+				winner: body.youWin ? body.username : null,
 			});
 		});
 	}
@@ -147,7 +147,7 @@ socket.on('play card', async data => {
 	const body = await result.json();
 	console.log(body);
 
-	if (data.nextPlayerId === body.uid) {
+	if (!data.winner && data.nextPlayerId === body.uid) {
 		const yourTurnElm = document.createElement('h1');
 		yourTurnElm.innerText = 'Your turn';
 		yourTurnElm.id = 'your-turn';
@@ -192,6 +192,10 @@ socket.on('play card', async data => {
 	}
 
 	updateBoard();
+
+	if (data.winner) {
+		console.log(data.winner + ' is the winner');
+	}
 });
 
 // socket.on win => remove card listener so user can not play cards

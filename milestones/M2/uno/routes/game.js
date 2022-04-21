@@ -347,18 +347,24 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 
 		query =
 			'SELECT COUNT(*)\
-		FROM game_cards\
-		WHERE game_id = $1 AND user_id = $2';
+			FROM game_cards\
+			WHERE game_id = $1 AND user_id = $2';
 
 		const { count } = await db.one(query, [gameId, userId]);
+
+		query = 'SELECT username\
+			FROM users\
+			WHERE id = $1 ';
+
+		const { username } = await db.one(query, [userId]);
 		// win condition met, brodcast this message
 		console.log('current hand count: ', count);
-		if (count == 0) {
-			console.log(`player ${userId} wins`);
-			return res
-				.status(200)
-				.json({ message: `player ${userId} wins`, status: 1002 });
-		}
+		// if (count == 0) {
+		// 	console.log(`player ${userId} wins`);
+		// 	return res
+		// 		.status(200)
+		// 		.json({ message: `player ${userId} wins`, status: 1002 });
+		// }
 
 		query = 'SELECT *\
 		FROM cards\
@@ -389,6 +395,8 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 			nextPlayerId: userIdList[updatedPlayerTurn].user_id,
 			playedBy: userId,
 			userIdList: userIdList,
+			youWin: count === '0',
+			username: username,
 		});
 	} catch (err) {
 		next(err);
