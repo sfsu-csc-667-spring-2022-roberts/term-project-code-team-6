@@ -56,6 +56,45 @@ function createYourTurn() {
 	gameRoomDiv.appendChild(yourTurnElm);
 }
 
+async function onCardPlay(cardId) {
+	const result = await fetch(`/game/${gameId}/play/` + cardId, {
+		method: 'POST',
+	});
+	const body = await result.json();
+	console.log(body);
+
+	if (body.status && (body.status == 1001 || body.status == 1002)) {
+		console.log(body.message);
+		return;
+	}
+
+	const card = document.getElementById(cardId);
+	createNewDiscardedCard(card.className, cardId, body.rotate);
+
+	card.remove();
+
+	removeYourTurn();
+
+	updateBoard();
+
+	if (body.youWin) {
+		// To do - add ui
+		console.log('You win');
+	}
+
+	socket.emit('play card', {
+		id: body.cardId,
+		gameId: gameId,
+		color: body.color,
+		value: body.value,
+		rotate: body.rotate,
+		nextPlayerId: body.nextPlayerId,
+		playedBy: body.playedBy,
+		userIdList: body.userIdList,
+		winner: body.youWin ? body.username : null,
+	});
+}
+
 const userCards = document.getElementById('user-cards');
 const pathArray = window.location.pathname.split('/');
 const gameId =
@@ -94,10 +133,11 @@ if (userCards && deck && gameId) {
 			return;
 		}
 
-		const newUserCardDiv = document.createElement('div');
-		newUserCardDiv.className = `card ${body.card.color}-${body.card.value}`;
-		newUserCardDiv.id = body.card.id;
-		userCards.appendChild(newUserCardDiv);
+		const newCard = document.createElement('div');
+		newCard.className = `card ${body.card.color}-${body.card.value}`;
+		newCard.id = body.card.id;
+		newCard.addEventListener('click', () => onCardPlay(body.card.id));
+		userCards.appendChild(newCard);
 
 		removeYourTurn();
 
@@ -115,44 +155,7 @@ if (userCards && deck && gameId) {
 if (userCards && gameId) {
 	for (let card of userCards.children) {
 		let cardId = card.id;
-		card.addEventListener('click', async () => {
-			const result = await fetch(`/game/${gameId}/play/` + cardId, {
-				method: 'POST',
-			});
-			const body = await result.json();
-			console.log(body);
-
-			if (body.status && (body.status == 1001 || body.status == 1002)) {
-				console.log(body.message);
-				return;
-			}
-
-			const card = document.getElementById(cardId);
-			createNewDiscardedCard(card.className, cardId, body.rotate);
-
-			card.remove();
-
-			removeYourTurn();
-
-			updateBoard();
-
-			if (body.youWin) {
-				// To do - add ui
-				console.log('You win');
-			}
-
-			socket.emit('play card', {
-				id: body.cardId,
-				gameId: gameId,
-				color: body.color,
-				value: body.value,
-				rotate: body.rotate,
-				nextPlayerId: body.nextPlayerId,
-				playedBy: body.playedBy,
-				userIdList: body.userIdList,
-				winner: body.youWin ? body.username : null,
-			});
-		});
+		card.addEventListener('click', () => onCardPlay(cardId));
 	}
 }
 
@@ -184,6 +187,57 @@ socket.on('start game', data => {
 	// Don't know why if reload is trigged at the same time
 	// users all get the same cards
 	setTimeout(() => window.location.reload(), Math.floor(Math.random() * 1000));
+});
+
+socket.on('draw card', async data => {
+	console.log(data);
+
+	const result = await fetch('/userInfo');
+	const body = await result.json();
+	console.log(body);
+
+	if (data.nextPlayerId === body.uid) {
+		createYourTurn();
+	}
+
+	console.log(data.userIdList);
+
+	const userIndex = data.userIdList.findIndex(uid => uid.user_id === body.uid);
+	console.log('user index is: ', userIndex);
+
+	const previousPlayerIndex = data.userIdList.findIndex(
+		uid => uid.user_id === data.playedBy
+	);
+
+	console.log('previous player index: ', previousPlayerIndex);
+
+	const p1 = document.getElementById('p1');
+	const p2 = document.getElementById('p2');
+	const p3 = document.getElementById('p3');
+
+	const backcard = document.createElement('div');
+	backcard.className = 'card backcard';
+
+	if (data.userIdList.length == 2) {
+		p1.appendChild(backcard);
+	} else if (data.userIdList.length == 3) {
+		(userIndex + 1) % data.userIdList.length === previousPlayerIndex
+			? p1.appendChild(backcard)
+			: p2.appendChild(backcard);
+	} else {
+		if ((userIndex + 1) % data.userIdList.length === previousPlayerIndex) {
+			p3.appendChild(backcard);
+		} else if (
+			(userIndex + 2) % data.userIdList.length ===
+			previousPlayerIndex
+		) {
+			p1.appendChild(backcard);
+		} else {
+			p2.appendChild(backcard);
+		}
+	}
+
+	updateBoard();
 });
 
 socket.on('play card', async data => {
