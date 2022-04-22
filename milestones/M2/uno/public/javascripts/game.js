@@ -82,6 +82,15 @@ async function onCardPlay(cardId) {
 		console.log('You win');
 	}
 
+	if (!body.youWin && body.isColorRequired) {
+		console.log('Get user color input');
+		const result = await fetch(`/game/${gameId}/wild/` + 'red', {
+			method: 'POST',
+		});
+		const msg = await result.json();
+		console.log(msg);
+	}
+
 	socket.emit('play card', {
 		id: body.cardId,
 		gameId: gameId,

@@ -345,12 +345,20 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		}
 
 		let turnToNextPlayer = 1;
-		if (
+		let wildFlag = false;
+		if (fetchedCard.value === 'wild') {
+			console.log('wild card played');
+			wildFlag = true;
+		} else if (
 			fetchedCard.value === 'draw4' ||
 			fetchedCard.value === 'draw2' ||
 			fetchedCard.value === 'skip'
 		) {
 			turnToNextPlayer++;
+			if (fetchedCard.value === 'draw4') {
+				console.log('draw4 played');
+				wildFlag = true;
+			}
 		}
 		console.log('turnToNextPlayer is: ', turnToNextPlayer);
 
@@ -363,7 +371,7 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		await db.any(query, [newOrder, rotate, gameId, cardId]);
 
 		let updatedPlayerTurn = fetchedGame.player_turn;
-		while (turnToNextPlayer > 0) {
+		while (!wildFlag && turnToNextPlayer > 0) {
 			updatedPlayerTurn =
 				(fetchedGame.clockwise
 					? updatedPlayerTurn - 1
@@ -415,6 +423,7 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 			youWin: count === '0',
 			yourTurn: userIdList[updatedPlayerTurn].user_id === userId,
 			username: username,
+			isColorRequired: wildFlag,
 		});
 	} catch (err) {
 		next(err);
