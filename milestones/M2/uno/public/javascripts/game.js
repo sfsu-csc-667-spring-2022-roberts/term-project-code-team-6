@@ -49,6 +49,13 @@ function removeYourTurn() {
 	if (yourTurn) yourTurn.remove();
 }
 
+function createYourTurn() {
+	const yourTurnElm = document.createElement('h1');
+	yourTurnElm.innerText = 'Your turn';
+	yourTurnElm.id = 'your-turn';
+	gameRoomDiv.appendChild(yourTurnElm);
+}
+
 const userCards = document.getElementById('user-cards');
 const pathArray = window.location.pathname.split('/');
 const gameId =
@@ -189,10 +196,7 @@ socket.on('play card', async data => {
 	console.log(body);
 
 	if (!data.winner && data.nextPlayerId === body.uid) {
-		const yourTurnElm = document.createElement('h1');
-		yourTurnElm.innerText = 'Your turn';
-		yourTurnElm.id = 'your-turn';
-		gameRoomDiv.appendChild(yourTurnElm);
+		createYourTurn();
 	}
 	console.log(data.userIdList);
 
