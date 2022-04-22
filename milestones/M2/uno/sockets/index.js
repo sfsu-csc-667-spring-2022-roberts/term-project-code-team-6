@@ -5,10 +5,17 @@ const socketApi = {
 
 io.on('connection', function (socket) {
 	console.log('A user connected');
+
 	socket.join('lobby');
+
 	socket.on('disconnect', () => {
 		// io.emit('chat message', 'Someone disconnected!');
 		console.log('user disconnected');
+	});
+
+	socket.on('draw card', data => {
+		if (data.gameId)
+			socket.broadcast.to('room' + data.gameId).emit('draw card', data);
 	});
 
 	socket.on('play card', data => {
