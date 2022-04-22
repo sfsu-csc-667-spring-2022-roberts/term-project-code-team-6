@@ -67,6 +67,18 @@ function createNewDiscardedCard(className, cardId, rotate) {
 	discardedContainer.appendChild(newDiscarded);
 }
 
+const deck = document.getElementById('deck');
+if (deck) {
+	deck.addEventListener('click', async () => {
+		const result = await fetch(`/game/${gameId}/draw`, {
+			method: 'POST',
+		});
+		const body = await result.json();
+		console.log(body);
+
+	});
+}
+
 if (userCards && gameId) {
 	for (card of userCards.children) {
 		let cardId = card.id;
