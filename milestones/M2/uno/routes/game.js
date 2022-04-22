@@ -412,7 +412,7 @@ router.post('/:id/draw', authUser, async (req, res, next) => {
 		console.log('gameId is: ', gameId);
 		console.log('userId is: ', userId);
 
-		const { isUserTurn, fetchedGame } = await gameDao.checkUserTurn(
+		const { isUserTurn, fetchedGame, userIdList } = await gameDao.checkUserTurn(
 			gameId,
 			userId
 		);
@@ -423,7 +423,13 @@ router.post('/:id/draw', authUser, async (req, res, next) => {
 				status: 1001,
 			});
 		}
-		await cardDao.drawCards(gameId, userId, drawCount);
+		const { cardToAssgin } = await cardDao.drawCards(gameId, userId, drawCount);
+
+		let query = 'SELECT *\
+		FROM cards\
+		WHERE id = $1';
+		const fetchedCard = await db.one(query, [cardToAssgin[0].card_id]);
+		console.log('Card info: ', fetchedCard);
 
 		let updatedPlayerTurn =
 			(fetchedGame.clockwise
@@ -433,13 +439,17 @@ router.post('/:id/draw', authUser, async (req, res, next) => {
 			updatedPlayerTurn < 0 ? fetchedGame.userCount - 1 : updatedPlayerTurn;
 		console.log('updated player turn: ', updatedPlayerTurn);
 
-		let query = 'UPDATE games\
+		query = 'UPDATE games\
 			SET player_turn = $1\
 			WHERE id = $2;';
 		await db.any(query, [updatedPlayerTurn, gameId]);
 
 		res.status(201).json({
 			message: 'card is drew',
+			card: fetchedCard,
+			nextPlayerId: userIdList[updatedPlayerTurn].user_id,
+			drewBy: userId,
+			userIdList: userIdList,
 		});
 	} catch (err) {
 		next(err);

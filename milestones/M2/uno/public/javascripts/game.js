@@ -95,6 +95,13 @@ if (userCards && deck && gameId) {
 		removeYourTurn();
 
 		updateBoard();
+
+		socket.emit('draw card', {
+			gameId: gameId,
+			nextPlayerId: body.nextPlayerId,
+			drewBy: body.playedBy,
+			userIdList: body.userIdList,
+		});
 	});
 }
 
