@@ -7,12 +7,22 @@ async function drawCards(gameId, userId, count) {
 			WHERE game_id = $1 AND user_id IS null AND discarded = false\
 			ORDER BY "order"\
 			LIMIT $2;';
-	const cardToAssgin = await db.manyOrNone(query, [gameId, count]);
-	console.log(cardToAssgin);
+	let cardToAssgin = await db.manyOrNone(query, [gameId, count]);
+	console.log('cardToAssgin', cardToAssgin);
 
-	if (!cardToAssgin) {
-		console.log('No cards in the deck');
-		return { cardToAssgin };
+	if (cardToAssgin.length < count) {
+		console.log(
+			`No enough cards in the deck: Need: ${count}, Actual: ${cardToAssgin.length} , shuffle the discard pile`
+		);
+		query =
+			'UPDATE game_cards\
+            SET discarded = false\
+            WHERE game_id = $1;';
+		await db.any(query, [gameId]);
+		const retObj = await drawCards(gameId, userId, count);
+		retObj.reshuffle = true;
+		console.log(retObj);
+		return retObj; 
 	}
 
 	for (let i = 0; i < count; i++) {
@@ -25,6 +35,7 @@ async function drawCards(gameId, userId, count) {
 	}
 	return {
 		cardToAssgin,
+		reshuffle: false,
 	};
 }
 
