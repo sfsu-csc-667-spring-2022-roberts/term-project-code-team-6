@@ -326,10 +326,11 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		if (
 			fetchedGame.curr_color !== 'wild' &&
 			fetchedCard.color !== 'wild' &&
-			fetchedGame.curr_color !== fetchedCard.color
+			fetchedGame.curr_color !== fetchedCard.color &&
+			fetchedGame.curr_value !== fetchedCard.value
 		) {
 			return res.status(200).json({
-				message: 'Color mismatch',
+				message: 'Card mismatch',
 				status: 1002,
 			});
 		}
@@ -351,12 +352,13 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		console.log('updated player turn: ', updatedPlayerTurn);
 		query =
 			'UPDATE games\
-				SET "discardedCount" = $1, player_turn = $2, curr_color = $3\
-				WHERE id = $4;';
+				SET "discardedCount" = $1, player_turn = $2, curr_color = $3, curr_value = $4\
+				WHERE id = $5;';
 		await db.any(query, [
 			fetchedGame.discardedCount + 1,
 			updatedPlayerTurn,
 			fetchedCard.color,
+			fetchedCard.value,
 			gameId,
 		]);
 
