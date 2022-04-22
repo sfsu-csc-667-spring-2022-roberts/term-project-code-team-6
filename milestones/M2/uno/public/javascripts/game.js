@@ -91,7 +91,7 @@ if (userCards && gameId) {
 
 			if (
 				body.status &&
-				(body.status == 1001 || body.status == 1002 || body.status == 1003)
+				(body.status == 1001 || body.status == 1002 )
 			) {
 				console.log(body.message);
 				return;
@@ -213,6 +213,8 @@ socket.on('play card', async data => {
 
 	if (data.winner) {
 		console.log(data.winner + ' is the winner');
+
+		// to-do remove card listeners from user
 	}
 });
 
