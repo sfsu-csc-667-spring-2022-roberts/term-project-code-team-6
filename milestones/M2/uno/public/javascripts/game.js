@@ -43,6 +43,12 @@ function updateBoard() {
 	}
 }
 
+// remove your turn notice
+function removeYourTurn() {
+	const yourTurn = document.getElementById('your-turn');
+	if (yourTurn) yourTurn.remove();
+}
+
 const userCards = document.getElementById('user-cards');
 const pathArray = window.location.pathname.split('/');
 const gameId =
@@ -68,7 +74,7 @@ function createNewDiscardedCard(className, cardId, rotate) {
 }
 
 const deck = document.getElementById('deck');
-if (deck) {
+if (userCards && deck && gameId) {
 	deck.addEventListener('click', async () => {
 		const result = await fetch(`/game/${gameId}/draw`, {
 			method: 'POST',
@@ -80,6 +86,15 @@ if (deck) {
 			console.log(body.message);
 			return;
 		}
+
+		const newUserCardDiv = document.createElement('div');
+		newUserCardDiv.className = `card ${body.card.color}-${body.card.value}`;
+		newUserCardDiv.id = body.card.id;
+		userCards.appendChild(newUserCardDiv);
+
+		removeYourTurn();
+
+		updateBoard();
 	});
 }
 
@@ -103,9 +118,8 @@ if (userCards && gameId) {
 
 			card.remove();
 
-			// remove your turn notice
-			const yourTurn = document.getElementById('your-turn');
-			if (yourTurn) yourTurn.remove();
+			removeYourTurn();
+
 			updateBoard();
 
 			if (body.youWin) {
