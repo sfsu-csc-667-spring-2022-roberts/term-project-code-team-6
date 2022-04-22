@@ -4,6 +4,8 @@ const authUser = require('../middleware/isAuth');
 const { body, validationResult } = require('express-validator');
 const db = require('../db');
 const socketApi = require('../sockets');
+const cardDao = require('../db/cardDao');
+const gardDao = require('../db/gameDao');
 
 // Create Game
 router.post(
@@ -102,7 +104,7 @@ router.get('/:id', authUser, async (req, res, next) => {
 				'SELECT COUNT(*)\
 				FROM game_cards\
 				WHERE game_id = $1 AND user_id = $2;';
-			playerCards = {};
+			let playerCards = {};
 			if (userIdList.length == 2) {
 				const p1Index = (userIndex + 1) % userIdList.length;
 				console.log('p1 index is at: ', p1Index);
@@ -292,24 +294,29 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 
 		// to-do check if player has that card
 
-		let query =
-			'SELECT user_id\
-		FROM game_users\
-		WHERE game_id = $1\
-		ORDER BY player_order;';
-		const userIdList = await db.any(query, [gameId]);
-		console.log(userIdList);
+		// let query =
+		// 	'SELECT user_id\
+		// FROM game_users\
+		// WHERE game_id = $1\
+		// ORDER BY player_order;';
+		// const userIdList = await db.any(query, [gameId]);
+		// console.log(userIdList);
 
-		const userIndex = userIdList.findIndex(uid => uid.user_id === userId);
+		// const userIndex = userIdList.findIndex(uid => uid.user_id === userId);
 
-		query = 'SELECT *\
-		FROM games\
-		WHERE id = $1';
-		const fetchedGame = await db.one(query, [gameId]);
-		console.log('Game info: ', fetchedGame);
-		console.log('Total discarded cards: ', fetchedGame.discardedCount);
+		// query = 'SELECT *\
+		// FROM games\
+		// WHERE id = $1';
+		// const fetchedGame = await db.one(query, [gameId]);
+		// console.log('Game info: ', fetchedGame);
+		// console.log('Total discarded cards: ', fetchedGame.discardedCount);
 
-		if (userIndex !== fetchedGame.player_turn) {
+		const { isUserTurn, userIdList, fetchedGame } = gardDao.checkUserTurn(
+			gameId,
+			userId
+		);
+
+		if (!isUserTurn) {
 			return res.status(200).json({
 				message: "Cannot not play cards in other user's turn",
 				status: 1001,
@@ -317,7 +324,7 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		}
 		console.log("In user's turn");
 
-		query = 'SELECT *\
+		let query = 'SELECT *\
 		FROM cards\
 		WHERE id = $1';
 		const fetchedCard = await db.one(query, [cardId]);
@@ -399,27 +406,14 @@ router.post('/:id/draw', authUser, async (req, res, next) => {
 	try {
 		const gameId = req.params.id;
 		const userId = req.session.userId;
+		const drawCount = 1;
 		console.log('gameId is: ', gameId);
 		console.log('userId is: ', userId);
 
-		let query =
-			'SELECT card_id\
-			FROM public.game_cards\
-			WHERE game_id = $1 AND user_id IS null AND discarded = false\
-			ORDER BY "order"\
-			LIMIT 1;';
-		const cardToAssgin = await db.oneOrNone(query, [gameId]);
-		console.log(cardToAssgin);
-
-		query =
-			'UPDATE game_cards\
-			SET user_id = $1\
-			WHERE game_id = $2 AND card_id = $3;';
-		console.log('Assgining card to user: ', userId);
-		await db.any(query, [userId, gameId, cardToAssgin.card_id]);
+		cardDao.drawCards(gameId, userId, drawCount);
 
 		res.status(201).json({
-			message: `card ${cardToAssgin.card_id} is drew`,
+			message: 'card is drew',
 		});
 	} catch (err) {
 		next(err);
