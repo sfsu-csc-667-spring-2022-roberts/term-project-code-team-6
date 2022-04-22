@@ -331,7 +331,7 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		WHERE id = $1';
 		const fetchedCard = await db.one(query, [cardId]);
 		console.log('Card info: ', fetchedCard);
-		// Check color
+
 		if (
 			fetchedGame.curr_color !== 'wild' &&
 			fetchedCard.color !== 'wild' &&
@@ -340,9 +340,19 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		) {
 			return res.status(200).json({
 				message: 'Card mismatch',
-				status: 1002,
+				status: 1001,
 			});
 		}
+
+		let turnToNextPlayer = 1;
+		if (
+			fetchedCard.value === 'draw4' ||
+			fetchedCard.value === 'draw2' ||
+			fetchedCard.value === 'skip'
+		) {
+			turnToNextPlayer++;
+		}
+		console.log('turnToNextPlayer is: ', turnToNextPlayer);
 
 		query =
 			'UPDATE game_cards\
@@ -352,13 +362,21 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		const rotate = Math.floor(Math.random() * 23) * 15; // rotate(0 deg to 359 deg)
 		await db.any(query, [newOrder, rotate, gameId, cardId]);
 
-		let updatedPlayerTurn =
-			(fetchedGame.clockwise
-				? fetchedGame.player_turn - 1
-				: fetchedGame.player_turn + 1) % fetchedGame.userCount;
-		updatedPlayerTurn =
-			updatedPlayerTurn < 0 ? fetchedGame.userCount - 1 : updatedPlayerTurn;
+		let updatedPlayerTurn = fetchedGame.player_turn;
+		while (turnToNextPlayer > 0) {
+			updatedPlayerTurn =
+				(fetchedGame.clockwise
+					? updatedPlayerTurn - 1
+					: updatedPlayerTurn + 1) % fetchedGame.userCount;
+			updatedPlayerTurn =
+				updatedPlayerTurn < 0 ? fetchedGame.userCount - 1 : updatedPlayerTurn;
+			turnToNextPlayer--;
+		}
 		console.log('updated player turn: ', updatedPlayerTurn);
+		console.log(
+			"It is still this player's turn? ",
+			userIdList[updatedPlayerTurn].user_id === userId
+		);
 		query =
 			'UPDATE games\
 				SET "discardedCount" = $1, player_turn = $2, curr_color = $3, curr_value = $4\
@@ -382,7 +400,6 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 			WHERE id = $1 ';
 		const { username } = await db.one(query, [userId]);
 
-		// win condition met, brodcast this message
 		console.log('current hand count: ', count);
 		console.log('next player is: ', userIdList[updatedPlayerTurn].user_id);
 
@@ -396,6 +413,7 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 			playedBy: userId,
 			userIdList: userIdList,
 			youWin: count === '0',
+			yourTurn: userIdList[updatedPlayerTurn].user_id === userId,
 			username: username,
 		});
 	} catch (err) {
@@ -423,8 +441,13 @@ router.post('/:id/draw', authUser, async (req, res, next) => {
 				status: 1001,
 			});
 		}
-		const { cardToAssgin } = await cardDao.drawCards(gameId, userId, drawCount);
-
+		const { cardToAssgin, reshuffle } = await cardDao.drawCards(
+			gameId,
+			userId,
+			drawCount
+		);
+		console.log('cardToAssgin in game.js: ', cardToAssgin);
+		console.log('Is reshuffle: ', reshuffle);
 		let query = 'SELECT *\
 		FROM cards\
 		WHERE id = $1';

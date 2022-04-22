@@ -63,7 +63,7 @@ async function onCardPlay(cardId) {
 	const body = await result.json();
 	console.log(body);
 
-	if (body.status && (body.status == 1001 || body.status == 1002)) {
+	if (body.status && body.status == 1001) {
 		console.log(body.message);
 		return;
 	}
@@ -73,7 +73,7 @@ async function onCardPlay(cardId) {
 
 	card.remove();
 
-	removeYourTurn();
+	if (!body.yourTurn) removeYourTurn();
 
 	updateBoard();
 
