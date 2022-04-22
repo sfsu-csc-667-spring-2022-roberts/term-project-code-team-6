@@ -396,3 +396,11 @@
 .discarded-cards_container .card {
 	position: absolute;
 }
+
+#deck {
+	position: absolute;
+	top: 50%;
+	left: 65%;
+	transform: translateY(-50%);
+	cursor: pointer;
+}
