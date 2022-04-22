@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const messages = document.getElementById('chat-msg');
 const form = document.getElementById('chat-box');
 const input = document.getElementById('chat-input');

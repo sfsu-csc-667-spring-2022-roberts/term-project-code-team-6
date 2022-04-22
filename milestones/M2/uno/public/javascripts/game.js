@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const CARD_OFFSET = 30;
 const CARD_WIDTH = 80;
 const CARD_HEIGHT = 126;
@@ -5,9 +6,9 @@ const CARD_HEIGHT = 126;
 function updateBoard() {
 	const playerCards = document.getElementsByClassName('hand');
 	if (playerCards && playerCards.length > 0) {
-		for (hand of playerCards) {
+		for (let hand of playerCards) {
 			let right = 0;
-			for (card of hand.children) {
+			for (let card of hand.children) {
 				card.style.right = right + 'px';
 				right += CARD_OFFSET;
 			}
@@ -44,7 +45,6 @@ function updateBoard() {
 
 const userCards = document.getElementById('user-cards');
 const pathArray = window.location.pathname.split('/');
-const game = document.getElementsByClassName('game');
 const gameId =
 	pathArray.length === 3 && pathArray[1] === 'game' ? pathArray[2] : null;
 
@@ -80,7 +80,7 @@ if (deck) {
 }
 
 if (userCards && gameId) {
-	for (card of userCards.children) {
+	for (let card of userCards.children) {
 		let cardId = card.id;
 		card.addEventListener('click', async () => {
 			const result = await fetch(`/game/${gameId}/play/` + cardId, {
@@ -150,6 +150,7 @@ socket.on('join game', data => {
 	}
 });
 
+// eslint-disable-next-line no-unused-vars
 socket.on('start game', data => {
 	// Don't know why if reload is trigged at the same time
 	// users all get the same cards
