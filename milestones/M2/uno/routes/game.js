@@ -488,4 +488,47 @@ router.post('/:id/draw', authUser, async (req, res, next) => {
 	}
 });
 
+// Update Color
+router.post('/:id/wild/:color', authUser, async (req, res, next) => {
+	try {
+		const gameId = req.params.id;
+		const color = req.params.color;
+		const userId = req.session.userId;
+		console.log('gameId is: ', gameId);
+		console.log('color is: ', color);
+
+		const { isUserTurn, fetchedGame } = await gameDao.checkUserTurn(
+			gameId,
+			userId
+		);
+		console.log('isUserTurn: ', isUserTurn);
+		if (!isUserTurn) {
+			return res.status(200).json({
+				message: "Cannot not update color in other user's turn",
+				status: 1001,
+			});
+		}
+
+		let updatedPlayerTurn =
+			(fetchedGame.clockwise
+				? fetchedGame.player_turn - 1
+				: fetchedGame.player_turn + 1) % fetchedGame.userCount;
+		updatedPlayerTurn =
+			updatedPlayerTurn < 0 ? fetchedGame.userCount - 1 : updatedPlayerTurn;
+		console.log('updated player turn: ', updatedPlayerTurn);
+
+		let query =
+			'UPDATE games\
+			SET player_turn = $1, curr_color = $2\
+			WHERE id = $3;';
+		await db.any(query, [updatedPlayerTurn, color, gameId]);
+
+		res.status(201).json({
+			message: `color is updated to: ${color}`,
+		});
+	} catch (err) {
+		next(err);
+	}
+});
+
 module.exports = router;

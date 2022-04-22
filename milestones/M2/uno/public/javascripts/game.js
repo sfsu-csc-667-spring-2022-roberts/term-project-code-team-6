@@ -89,6 +89,7 @@ async function onCardPlay(cardId) {
 		});
 		const msg = await result.json();
 		console.log(msg);
+		removeYourTurn();
 	}
 
 	socket.emit('play card', {

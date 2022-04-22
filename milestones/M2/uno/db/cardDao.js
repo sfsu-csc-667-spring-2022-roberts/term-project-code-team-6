@@ -19,6 +19,10 @@ async function drawCards(gameId, userId, count) {
             SET discarded = false\
             WHERE game_id = $1;';
 		await db.any(query, [gameId]);
+
+        // to-do set discard to 0
+
+
 		const retObj = await drawCards(gameId, userId, count);
 		retObj.reshuffle = true;
 		console.log(retObj);
