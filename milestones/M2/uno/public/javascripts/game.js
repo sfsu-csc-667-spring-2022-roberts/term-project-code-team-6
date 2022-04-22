@@ -76,6 +76,10 @@ if (deck) {
 		const body = await result.json();
 		console.log(body);
 
+		if (body.status && body.status == 1001) {
+			console.log(body.message);
+			return;
+		}
 	});
 }
 
@@ -89,10 +93,7 @@ if (userCards && gameId) {
 			const body = await result.json();
 			console.log(body);
 
-			if (
-				body.status &&
-				(body.status == 1001 || body.status == 1002 )
-			) {
+			if (body.status && (body.status == 1001 || body.status == 1002)) {
 				console.log(body.message);
 				return;
 			}

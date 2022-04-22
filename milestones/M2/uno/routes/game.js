@@ -5,7 +5,7 @@ const { body, validationResult } = require('express-validator');
 const db = require('../db');
 const socketApi = require('../sockets');
 const cardDao = require('../db/cardDao');
-const gardDao = require('../db/gameDao');
+const gameDao = require('../db/gameDao');
 
 // Create Game
 router.post(
@@ -311,10 +311,12 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		// console.log('Game info: ', fetchedGame);
 		// console.log('Total discarded cards: ', fetchedGame.discardedCount);
 
-		const { isUserTurn, userIdList, fetchedGame } = gardDao.checkUserTurn(
+		const { isUserTurn, userIdList, fetchedGame } = await gameDao.checkUserTurn(
 			gameId,
 			userId
 		);
+
+		console.log('isUserTurn: ', isUserTurn);
 
 		if (!isUserTurn) {
 			return res.status(200).json({
@@ -410,7 +412,31 @@ router.post('/:id/draw', authUser, async (req, res, next) => {
 		console.log('gameId is: ', gameId);
 		console.log('userId is: ', userId);
 
-		cardDao.drawCards(gameId, userId, drawCount);
+		const { isUserTurn, fetchedGame } = await gameDao.checkUserTurn(
+			gameId,
+			userId
+		);
+		console.log('isUserTurn: ', isUserTurn);
+		if (!isUserTurn) {
+			return res.status(200).json({
+				message: "Cannot not draw cards in other user's turn",
+				status: 1001,
+			});
+		}
+		await cardDao.drawCards(gameId, userId, drawCount);
+
+		let updatedPlayerTurn =
+			(fetchedGame.clockwise
+				? fetchedGame.player_turn - 1
+				: fetchedGame.player_turn + 1) % fetchedGame.userCount;
+		updatedPlayerTurn =
+			updatedPlayerTurn < 0 ? fetchedGame.userCount - 1 : updatedPlayerTurn;
+		console.log('updated player turn: ', updatedPlayerTurn);
+
+		let query = 'UPDATE games\
+			SET player_turn = $1\
+			WHERE id = $2;';
+		await db.any(query, [updatedPlayerTurn, gameId]);
 
 		res.status(201).json({
 			message: 'card is drew',

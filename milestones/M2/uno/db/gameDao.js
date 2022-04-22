@@ -18,6 +18,8 @@ async function checkUserTurn(gameId, userId) {
 	console.log('Game info: ', fetchedGame);
 	console.log('Total discarded cards: ', fetchedGame.discardedCount);
 
+	console.log(userIndex, fetchedGame.player_turn, userIndex === fetchedGame.player_turn);
+
 	return {
 		isUserTurn: userIndex === fetchedGame.player_turn,
 		userIdList,
