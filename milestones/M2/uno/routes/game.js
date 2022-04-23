@@ -345,10 +345,10 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		}
 
 		let turnToNextPlayer = 1;
-		let wildFlag = false;
+		let wildFlag = '';
 		if (fetchedCard.value === 'wild') {
 			console.log('wild card played');
-			wildFlag = true;
+			wildFlag = 'wild';
 		} else if (
 			fetchedCard.value === 'draw4' ||
 			fetchedCard.value === 'draw2' ||
@@ -357,7 +357,7 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 			turnToNextPlayer++;
 			if (fetchedCard.value === 'draw4') {
 				console.log('draw4 played');
-				wildFlag = true;
+				wildFlag = 'draw4';
 			}
 		}
 		console.log('turnToNextPlayer is: ', turnToNextPlayer);
@@ -423,7 +423,7 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 			youWin: count === '0',
 			yourTurn: userIdList[updatedPlayerTurn].user_id === userId,
 			username: username,
-			isColorRequired: wildFlag,
+			wildFlag: wildFlag,
 		});
 	} catch (err) {
 		next(err);
@@ -489,46 +489,68 @@ router.post('/:id/draw', authUser, async (req, res, next) => {
 });
 
 // Update Color
-router.post('/:id/wild/:color', authUser, async (req, res, next) => {
-	try {
-		const gameId = req.params.id;
-		const color = req.params.color;
-		const userId = req.session.userId;
-		console.log('gameId is: ', gameId);
-		console.log('color is: ', color);
+router.post(
+	'/:id/wild/:wildFlag/color/:color',
+	authUser,
+	async (req, res, next) => {
+		try {
+			const gameId = req.params.id;
+			const wildFlag = req.params.wildFlag;
+			const color = req.params.color;
+			const userId = req.session.userId;
+			console.log('gameId is: ', gameId);
+			console.log('color is: ', color);
+			console.log('wildFlag is: ', wildFlag);
 
-		const { isUserTurn, fetchedGame } = await gameDao.checkUserTurn(
-			gameId,
-			userId
-		);
-		console.log('isUserTurn: ', isUserTurn);
-		if (!isUserTurn) {
-			return res.status(200).json({
-				message: "Cannot not update color in other user's turn",
-				status: 1001,
-			});
-		}
+			const { isUserTurn, fetchedGame, userIdList } =
+				await gameDao.checkUserTurn(gameId, userId);
+			console.log('isUserTurn: ', isUserTurn);
+			if (!isUserTurn) {
+				return res.status(200).json({
+					message: "Cannot not update color in other user's turn",
+					status: 1001,
+				});
+			}
 
-		let updatedPlayerTurn =
-			(fetchedGame.clockwise
-				? fetchedGame.player_turn - 1
-				: fetchedGame.player_turn + 1) % fetchedGame.userCount;
-		updatedPlayerTurn =
-			updatedPlayerTurn < 0 ? fetchedGame.userCount - 1 : updatedPlayerTurn;
-		console.log('updated player turn: ', updatedPlayerTurn);
+			let updatedPlayerTurn = fetchedGame.player_turn;
+			let turnToNextPlayer = wildFlag === 'wild' ? 1 : 2;
+			while (!wildFlag && turnToNextPlayer > 0) {
+				updatedPlayerTurn =
+					(fetchedGame.clockwise
+						? updatedPlayerTurn - 1
+						: updatedPlayerTurn + 1) % fetchedGame.userCount;
+				updatedPlayerTurn =
+					updatedPlayerTurn < 0 ? fetchedGame.userCount - 1 : updatedPlayerTurn;
+				turnToNextPlayer--;
+			}
+			console.log('updated player turn: ', updatedPlayerTurn);
+			console.log(
+				"(update color) It is still this player's turn? ",
+				userIdList[updatedPlayerTurn].user_id === userId
+			);
 
-		let query =
-			'UPDATE games\
+			// let updatedPlayerTurn =
+			// 	(fetchedGame.clockwise
+			// 		? fetchedGame.player_turn - 1
+			// 		: fetchedGame.player_turn + 1) % fetchedGame.userCount;
+			// updatedPlayerTurn =
+			// 	updatedPlayerTurn < 0 ? fetchedGame.userCount - 1 : updatedPlayerTurn;
+			console.log('updated player turn: ', updatedPlayerTurn);
+
+			let query =
+				'UPDATE games\
 			SET player_turn = $1, curr_color = $2\
 			WHERE id = $3;';
-		await db.any(query, [updatedPlayerTurn, color, gameId]);
+			await db.any(query, [updatedPlayerTurn, color, gameId]);
 
-		res.status(201).json({
-			message: `color is updated to: ${color}`,
-		});
-	} catch (err) {
-		next(err);
+			res.status(201).json({
+				message: `color is updated to: ${color}`,
+				yourTurn: userIdList[updatedPlayerTurn].user_id === userId,
+			});
+		} catch (err) {
+			next(err);
+		}
 	}
-});
+);
 
 module.exports = router;
