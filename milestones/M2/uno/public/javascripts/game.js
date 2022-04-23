@@ -80,16 +80,21 @@ async function onCardPlay(cardId) {
 	if (body.youWin) {
 		// To do - add ui
 		console.log('You win');
+		stopTheGame();
 	}
 
-	if (!body.youWin && body.isColorRequired) {
+	if (!body.youWin && body.wildFlag) {
 		console.log('Get user color input');
-		const result = await fetch(`/game/${gameId}/wild/` + 'red', {
-			method: 'POST',
-		});
+		const result = await fetch(
+			`/game/${gameId}/wild/${body.wildFlag}/color/` + 'red',
+			{
+				method: 'POST',
+			}
+		);
 		const msg = await result.json();
 		console.log(msg);
-		removeYourTurn();
+		if (!msg.yourTurn)
+			removeYourTurn();
 	}
 
 	socket.emit('play card', {
@@ -103,6 +108,48 @@ async function onCardPlay(cardId) {
 		userIdList: body.userIdList,
 		winner: body.youWin ? body.username : null,
 	});
+}
+
+async function onDrawCard() {
+	const result = await fetch(`/game/${gameId}/draw`, {
+		method: 'POST',
+	});
+	const body = await result.json();
+	console.log(body);
+
+	if (body.status && body.status == 1001) {
+		console.log(body.message);
+		return;
+	}
+
+	const newCard = document.createElement('div');
+	newCard.className = `card ${body.card.color}-${body.card.value}`;
+	newCard.id = body.card.id;
+	newCard.addEventListener('click', () => onCardPlay(body.card.id));
+	userCards.appendChild(newCard);
+
+	removeYourTurn();
+
+	updateBoard();
+
+	socket.emit('draw card', {
+		gameId: gameId,
+		nextPlayerId: body.nextPlayerId,
+		drewBy: body.playedBy,
+		userIdList: body.userIdList,
+	});
+}
+
+function stopTheGame() {
+	if (userCards && userCards.length > 0) {
+		console.log('remove user hand');
+		const newUserCards = userCards.cloneNode(true);
+		userCards.parentNode.replaceChild(newUserCards, userCards);
+	}
+
+	if (deck) {
+		deck.removeEventListener('click', onDrawCard);
+	}
 }
 
 const userCards = document.getElementById('user-cards');
@@ -131,35 +178,7 @@ function createNewDiscardedCard(className, cardId, rotate) {
 
 const deck = document.getElementById('deck');
 if (userCards && deck && gameId) {
-	deck.addEventListener('click', async () => {
-		const result = await fetch(`/game/${gameId}/draw`, {
-			method: 'POST',
-		});
-		const body = await result.json();
-		console.log(body);
-
-		if (body.status && body.status == 1001) {
-			console.log(body.message);
-			return;
-		}
-
-		const newCard = document.createElement('div');
-		newCard.className = `card ${body.card.color}-${body.card.value}`;
-		newCard.id = body.card.id;
-		newCard.addEventListener('click', () => onCardPlay(body.card.id));
-		userCards.appendChild(newCard);
-
-		removeYourTurn();
-
-		updateBoard();
-
-		socket.emit('draw card', {
-			gameId: gameId,
-			nextPlayerId: body.nextPlayerId,
-			drewBy: body.playedBy,
-			userIdList: body.userIdList,
-		});
-	});
+	deck.addEventListener('click', onDrawCard);
 }
 
 if (userCards && gameId) {
@@ -305,7 +324,8 @@ socket.on('play card', async data => {
 	if (data.winner) {
 		console.log(data.winner + ' is the winner');
 
-		// to-do remove card listeners from user
+		//remove card listeners from user
+		stopTheGame();
 	}
 });
 
