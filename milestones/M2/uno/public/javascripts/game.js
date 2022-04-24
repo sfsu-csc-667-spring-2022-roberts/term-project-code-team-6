@@ -294,7 +294,6 @@ socket.on('play card', async data => {
 
 	if (data.winner) {
 		console.log(data.winner + ' is the winner');
-
 		// to-do remove card listeners from user
 	}
 });
