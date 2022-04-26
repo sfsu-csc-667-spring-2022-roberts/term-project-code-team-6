@@ -108,7 +108,7 @@ router.get('/:id', authUser, async (req, res, next) => {
 			if (userIdList.length == 2) {
 				const p1Index = (userIndex + 1) % userIdList.length;
 				console.log('p1 index is at: ', p1Index);
-				const p1Id = userIdList[p1Index].user_id;
+				const p1Id = userIdList[p1Index].user_id;W
 				console.log('p1Id: ', p1Id);
 
 				const p1CardCountObj = await db.one(query, [gameId, p1Id]);
@@ -120,6 +120,7 @@ router.get('/:id', authUser, async (req, res, next) => {
 				console.log('p1Id: ', p1Id);
 
 				const p1CardCountObj = await db.one(query, [gameId, p1Id]);
+				console.log('p1Count: ', p1CardCountObj.count);
 				playerCards.p1 = new Array(+p1CardCountObj.count).fill(0);
 
 				const p2Index = (userIndex + 2) % userIdList.length;
@@ -127,7 +128,8 @@ router.get('/:id', authUser, async (req, res, next) => {
 				const p2Id = userIdList[p2Index].user_id;
 				console.log('p2Id: ', p2Id);
 
-				const p2CardCountObj = await db.one(query, [gameId, p1Id]);
+				const p2CardCountObj = await db.one(query, [gameId, p2Id]);
+				console.log('p2Count: ', p2CardCountObj.count);
 				playerCards.p2 = new Array(+p2CardCountObj.count).fill(0);
 			} else {
 				const p1Index = (userIndex + 2) % userIdList.length;
@@ -346,19 +348,24 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 
 		let turnToNextPlayer = 1;
 		let wildFlag = '';
+		let clockwise = fetchedGame.clockwise;
 		if (fetchedCard.value === 'wild') {
 			console.log('wild card played');
 			wildFlag = 'wild';
 		} else if (
 			fetchedCard.value === 'draw4' ||
 			fetchedCard.value === 'draw2' ||
-			fetchedCard.value === 'skip'
+			fetchedCard.value === 'skip' ||
+			(userIdList.length === 2 && fetchedCard.value === 'reverse')
 		) {
 			turnToNextPlayer++;
 			if (fetchedCard.value === 'draw4') {
 				console.log('draw4 played');
 				wildFlag = 'draw4';
 			}
+		} else if (fetchedCard.value === 'reverse') {
+			console.log('reverse played');
+			clockwise = !clockwise;
 		}
 		console.log('turnToNextPlayer is: ', turnToNextPlayer);
 
@@ -373,9 +380,8 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		let updatedPlayerTurn = fetchedGame.player_turn;
 		while (!wildFlag && turnToNextPlayer > 0) {
 			updatedPlayerTurn =
-				(fetchedGame.clockwise
-					? updatedPlayerTurn - 1
-					: updatedPlayerTurn + 1) % fetchedGame.userCount;
+				(clockwise ? updatedPlayerTurn - 1 : updatedPlayerTurn + 1) %
+				fetchedGame.userCount;
 			updatedPlayerTurn =
 				updatedPlayerTurn < 0 ? fetchedGame.userCount - 1 : updatedPlayerTurn;
 			turnToNextPlayer--;
@@ -387,13 +393,14 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		);
 		query =
 			'UPDATE games\
-				SET "discardedCount" = $1, player_turn = $2, curr_color = $3, curr_value = $4\
-				WHERE id = $5;';
+				SET "discardedCount" = $1, player_turn = $2, curr_color = $3, curr_value = $4, clockwise = $5\
+				WHERE id = $6;';
 		await db.any(query, [
 			fetchedGame.discardedCount + 1,
 			updatedPlayerTurn,
 			fetchedCard.color,
 			fetchedCard.value,
+			clockwise,
 			gameId,
 		]);
 

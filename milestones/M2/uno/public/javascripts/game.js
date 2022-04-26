@@ -93,8 +93,7 @@ async function onCardPlay(cardId) {
 		);
 		const msg = await result.json();
 		console.log(msg);
-		if (!msg.yourTurn)
-			removeYourTurn();
+		if (!msg.yourTurn) removeYourTurn();
 	}
 
 	socket.emit('play card', {
@@ -135,13 +134,13 @@ async function onDrawCard() {
 	socket.emit('draw card', {
 		gameId: gameId,
 		nextPlayerId: body.nextPlayerId,
-		drewBy: body.playedBy,
+		drewBy: body.drewBy,
 		userIdList: body.userIdList,
 	});
 }
 
 function stopTheGame() {
-	if (userCards && userCards.length > 0) {
+	if (userCards) {
 		console.log('remove user hand');
 		const newUserCards = userCards.cloneNode(true);
 		userCards.parentNode.replaceChild(newUserCards, userCards);
@@ -235,7 +234,7 @@ socket.on('draw card', async data => {
 	console.log('user index is: ', userIndex);
 
 	const previousPlayerIndex = data.userIdList.findIndex(
-		uid => uid.user_id === data.playedBy
+		uid => uid.user_id === data.drewBy
 	);
 
 	console.log('previous player index: ', previousPlayerIndex);
