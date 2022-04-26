@@ -15,9 +15,9 @@ router.get('/', authUser, async function (req, res) {
 });
 
 /* GET how to play page. */
-router.get('/how-to-play', function (req, res) {
-	res.render('how-to');
-});
+// router.get('/how-to-play', function (req, res) {
+// 	res.render('partials/how-to-play');
+// });
 
 router.get('/login', function (req, res) {
 	res.render('login');
