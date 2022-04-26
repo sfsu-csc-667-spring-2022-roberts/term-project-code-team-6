@@ -108,7 +108,7 @@ router.get('/:id', authUser, async (req, res, next) => {
 			if (userIdList.length == 2) {
 				const p1Index = (userIndex + 1) % userIdList.length;
 				console.log('p1 index is at: ', p1Index);
-				const p1Id = userIdList[p1Index].user_id;W
+				const p1Id = userIdList[p1Index].user_id;
 				console.log('p1Id: ', p1Id);
 
 				const p1CardCountObj = await db.one(query, [gameId, p1Id]);
