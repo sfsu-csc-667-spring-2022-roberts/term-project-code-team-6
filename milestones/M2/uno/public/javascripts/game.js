@@ -3,8 +3,22 @@ const CARD_OFFSET = 30;
 const CARD_WIDTH = 80;
 const CARD_HEIGHT = 126;
 
+const pathArray = window.location.pathname.split('/');
+const gameId =
+	pathArray.length === 3 && pathArray[1] === 'game' ? pathArray[2] : null;
+
+if (gameId) socket.emit('join room', { gameId: gameId });
+
+const gameRoomDiv = document.getElementById('game-room');
+const userCount = document.getElementById('user-count');
+
+const playerCards = document.getElementsByClassName('hand');
+const p1 = document.getElementById('p1');
+const p2 = document.getElementById('p2');
+const p3 = document.getElementById('p3');
+const userCards = document.getElementById('user-cards');
+
 function updateBoard() {
-	const playerCards = document.getElementsByClassName('hand');
 	if (playerCards && playerCards.length > 0) {
 		for (let hand of playerCards) {
 			let right = 0;
@@ -14,19 +28,19 @@ function updateBoard() {
 			}
 		}
 
-		const p1 = playerCards.item(0);
+		// const p1 = playerCards.item(0);
 		p1.style.transform = `translateX(${
 			((CARD_WIDTH - CARD_OFFSET) * (p1.children.length - 1) + CARD_WIDTH) / -2
 		}px)`;
 
-		const p2 = playerCards.item(1);
+		// const p2 = playerCards.item(1);
 		const p2width =
 			(CARD_WIDTH - CARD_OFFSET) * (p2.children.length - 1) + CARD_WIDTH;
 		p2.style.transform = `translateY(${
 			-CARD_HEIGHT - p2width / 2
 		}px) rotate(90deg)`;
 
-		const p3 = playerCards.item(2);
+		// const p3 = playerCards.item(2);
 		const p3width =
 			(CARD_WIDTH - CARD_OFFSET) * (p3.children.length - 1) + CARD_WIDTH;
 		const p3offsetY = -CARD_HEIGHT + p3width - p3width / 2;
@@ -34,7 +48,7 @@ function updateBoard() {
 			CARD_WIDTH * p3.children.length
 		}px) rotate(-90deg)`;
 
-		const userCards = playerCards.item(3);
+		// const userCards = playerCards.item(3);
 		userCards.style.transform = `translateX(${
 			((CARD_WIDTH - CARD_OFFSET) * (userCards.children.length - 1) +
 				CARD_WIDTH) /
@@ -85,9 +99,9 @@ async function onPlayCard(cardId) {
 
 		console.log('previous player index: ', neighborIndex);
 
-		const p1 = document.getElementById('p1');
-		const p2 = document.getElementById('p2');
-		const p3 = document.getElementById('p3');
+		// const p1 = document.getElementById('p1');
+		// const p2 = document.getElementById('p2');
+		// const p3 = document.getElementById('p3');
 
 		for (let i = 0; i < body.neighbor.drawCount; i++) {
 			const backcard = document.createElement('div');
@@ -155,6 +169,16 @@ async function onPlayCard(cardId) {
 	});
 }
 
+function addCardToHand(cards) {
+	for (let card of cards) {
+		const newCard = document.createElement('div');
+		newCard.className = `card ${card.color}-${card.value}`;
+		newCard.id = card.id;
+		newCard.addEventListener('click', () => onPlayCard(card.id));
+		userCards.appendChild(newCard);
+	}
+}
+
 async function onDrawCard() {
 	const result = await fetch(`/game/${gameId}/draw`, {
 		method: 'POST',
@@ -167,11 +191,7 @@ async function onDrawCard() {
 		return;
 	}
 
-	const newCard = document.createElement('div');
-	newCard.className = `card ${body.card.color}-${body.card.value}`;
-	newCard.id = body.card.id;
-	newCard.addEventListener('click', () => onPlayCard(body.card.id));
-	userCards.appendChild(newCard);
+	addCardToHand([body.card]);
 
 	removeYourTurn();
 
@@ -196,13 +216,6 @@ function stopTheGame() {
 		deck.removeEventListener('click', onDrawCard);
 	}
 }
-
-const userCards = document.getElementById('user-cards');
-const pathArray = window.location.pathname.split('/');
-const gameId =
-	pathArray.length === 3 && pathArray[1] === 'game' ? pathArray[2] : null;
-
-if (gameId) socket.emit('join room', { gameId: gameId });
 
 const startBtn = document.getElementById('start-game');
 if (startBtn && gameId) {
@@ -232,9 +245,6 @@ if (userCards && gameId) {
 		card.addEventListener('click', () => onPlayCard(cardId));
 	}
 }
-
-const gameRoomDiv = document.getElementById('game-room');
-const userCount = document.getElementById('user-count');
 
 socket.on('join game', data => {
 	console.log(data);
@@ -284,10 +294,6 @@ socket.on('draw card', async data => {
 	);
 
 	console.log('previous player index: ', previousPlayerIndex);
-
-	const p1 = document.getElementById('p1');
-	const p2 = document.getElementById('p2');
-	const p3 = document.getElementById('p3');
 
 	const backcard = document.createElement('div');
 	backcard.className = 'card backcard';
@@ -340,10 +346,6 @@ socket.on('play card', async data => {
 
 		console.log('previous player index: ', previousPlayerIndex);
 
-		const p1 = document.getElementById('p1');
-		const p2 = document.getElementById('p2');
-		const p3 = document.getElementById('p3');
-
 		// remove card from users's hand
 		if (data.userIdList.length == 2) {
 			p1.removeChild(p1.children[p1.children.length - 1]);
@@ -365,6 +367,15 @@ socket.on('play card', async data => {
 		}
 
 		// add cards to user if draw2 and draw4 were played
+		if (data.neighbor.drawCount) {
+			if (data.neighbor.id === body.uid) {
+				console.log('update user hand');
+
+				addCardToHand(data.neighbor.drawCards);
+			} else {
+				console.log('update backcards');
+			}
+		}
 	}
 
 	updateBoard();
