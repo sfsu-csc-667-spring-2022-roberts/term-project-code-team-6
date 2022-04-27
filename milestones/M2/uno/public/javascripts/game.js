@@ -203,9 +203,17 @@ async function onPlayCard(cardId) {
 		);
 		greenPicker.className = 'greenPicker';
 
+		const yellowPicker = document.createElement('div');
+		yellowPicker.addEventListener('click', () =>
+			onUpdateColor(body, 'yellow', colorPopup)
+		);
+		yellowPicker.className = 'yellowPicker';
+
 		colorPicker.append(redPicker);
 		colorPicker.append(bluePicker);
 		colorPicker.append(greenPicker);
+		colorPicker.append(yellowPicker);
+
 		colorPopup.append(colorPicker);
 		gameRoomDiv.append(colorPopup);
 
@@ -352,13 +360,13 @@ socket.on('join game', data => {
 		const newLobbyUser = document.createElement('div');
 		const uid = document.createElement('p');
 		const username = document.createElement('p');
-		const ready = document.createElement('p');
+		// const ready = document.createElement('p');
 		uid.innerText = `uid: ${data.uid}`;
 		username.innerText = `username: ${data.username}`;
-		ready.innerText = 'false';
+		// ready.innerText = 'false';
 		newLobbyUser.appendChild(uid);
 		newLobbyUser.appendChild(username);
-		newLobbyUser.appendChild(ready);
+		// newLobbyUser.appendChild(ready);
 		newLobbyUser.className = 'game-lobby_user';
 		userCount.innerText = `${data.userCount} playing`;
 
