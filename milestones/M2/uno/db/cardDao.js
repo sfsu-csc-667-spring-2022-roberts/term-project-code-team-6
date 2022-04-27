@@ -25,7 +25,7 @@ async function drawCards(gameId, userId, count) {
 		query =
 			'UPDATE games\
             SET discardedCount = 0\
-            WHERE game_id = $1;';
+            WHERE id = $1;';
 		await db.any(query, [gameId]);
 
 		const retObj = await drawCards(gameId, userId, count);

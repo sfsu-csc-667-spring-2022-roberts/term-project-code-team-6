@@ -117,8 +117,6 @@ async function onPlayCard(cardId) {
 
 	if (!body.yourTurn) removeYourTurn();
 
-	updateBoard();
-
 	if (body.youWin) {
 		// To do - add ui
 		console.log('You win');
@@ -135,8 +133,13 @@ async function onPlayCard(cardId) {
 		);
 		const msg = await result.json();
 		console.log(msg);
+
 		if (!msg.yourTurn) removeYourTurn();
+
+		body.nextPlayerId = msg.nextPlayerId;
 	}
+
+	updateBoard();
 
 	socket.emit('play card', {
 		id: body.cardId,
@@ -340,7 +343,7 @@ socket.on('play card', async data => {
 		const p1 = document.getElementById('p1');
 		const p2 = document.getElementById('p2');
 		const p3 = document.getElementById('p3');
-		
+
 		// remove card from users's hand
 		if (data.userIdList.length == 2) {
 			p1.removeChild(p1.children[p1.children.length - 1]);
@@ -360,7 +363,6 @@ socket.on('play card', async data => {
 				p2.removeChild(p2.children[p2.children.length - 1]);
 			}
 		}
-
 
 		// add cards to user if draw2 and draw4 were played
 	}

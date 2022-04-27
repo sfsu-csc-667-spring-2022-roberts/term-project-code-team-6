@@ -297,23 +297,6 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 
 		// to-do check if player has that card
 
-		// let query =
-		// 	'SELECT user_id\
-		// FROM game_users\
-		// WHERE game_id = $1\
-		// ORDER BY player_order;';
-		// const userIdList = await db.any(query, [gameId]);
-		// console.log(userIdList);
-
-		// const userIndex = userIdList.findIndex(uid => uid.user_id === userId);
-
-		// query = 'SELECT *\
-		// FROM games\
-		// WHERE id = $1';
-		// const fetchedGame = await db.one(query, [gameId]);
-		// console.log('Game info: ', fetchedGame);
-		// console.log('Total discarded cards: ', fetchedGame.discardedCount);
-
 		const { isUserTurn, userIdList, fetchedGame } = await gameDao.checkUserTurn(
 			gameId,
 			userId
@@ -410,11 +393,13 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 				`draw card type: ${hasDraw} and target player id: ${neighbor.id}`
 			);
 			if (hasDraw === 'draw4') {
-				neighbor.drawCount = 4;
-				cardDao.drawCards(gameId, neighbor.id, 4);
-			} else if (hasDraw === 'draw2') {
-				neighbor.drawCount = 2;
-				cardDao.drawCards(gameId, neighbor.id, 2);
+				neighbor.drawCount = hasDraw === 'draw4' ? 4 : 2;
+				const { cardToAssgin } = cardDao.drawCards(
+					gameId,
+					neighbor.id,
+					neighbor.drawCount
+				);
+				neighbor.drawCards = cardToAssgin;
 			}
 		}
 
@@ -547,7 +532,7 @@ router.post(
 
 			let updatedPlayerTurn = fetchedGame.player_turn;
 			let turnToNextPlayer = wildFlag === 'wild' ? 1 : 2;
-			while (!wildFlag && turnToNextPlayer > 0) {
+			while (turnToNextPlayer > 0) {
 				updatedPlayerTurn =
 					(fetchedGame.clockwise
 						? updatedPlayerTurn - 1
@@ -579,6 +564,7 @@ router.post(
 			res.status(201).json({
 				message: `color is updated to: ${color}`,
 				yourTurn: userIdList[updatedPlayerTurn].user_id === userId,
+				nextPlayerId: userIdList[updatedPlayerTurn].user_id,
 			});
 		} catch (err) {
 			next(err);
