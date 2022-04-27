@@ -17,7 +17,7 @@ module.exports = {
 	async down(queryInterface, Sequelize) {
 		return Promise.all([
 			queryInterface.removeColumn('games', 'player_turn'),
-			queryInterface.removeColumn('games', 'direction'),
+			queryInterface.removeColumn('games', 'clockwise'),
 		]);
 	},
 };
