@@ -2,7 +2,7 @@ const db = require('../db');
 
 async function drawCards(gameId, userId, count) {
 	let query =
-		'SELECT card_id, color, value\
+		'SELECT id, color, value\
 			FROM public.game_cards\
             JOIN cards ON card_id = cards.id\
 			WHERE game_id = $1 AND user_id IS null AND discarded = false\
@@ -24,7 +24,7 @@ async function drawCards(gameId, userId, count) {
 		// set discard to 0
 		query =
 			'UPDATE games\
-            SET discardedCount = 0\
+            SET "discardedCount" = 0\
             WHERE id = $1;';
 		await db.any(query, [gameId]);
 
@@ -39,8 +39,8 @@ async function drawCards(gameId, userId, count) {
 			'UPDATE game_cards\
                 SET user_id = $1\
                 WHERE game_id = $2 AND card_id = $3;';
-		console.log(`Assgining card ${cardToAssgin[i].card_id} to user: ${userId}`);
-		await db.any(query, [userId, gameId, cardToAssgin[i].card_id]);
+		console.log(`Assgining card ${cardToAssgin[i].id} to user: ${userId}`);
+		await db.any(query, [userId, gameId, cardToAssgin[i].id]);
 	}
 	return {
 		cardToAssgin,

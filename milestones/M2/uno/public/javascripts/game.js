@@ -179,6 +179,29 @@ function addCardToHand(cards) {
 	}
 }
 
+function addBackCards(count, affctedIndex, userIndex, playerCount) {
+	for (let i = 0; i < count; i++) {
+		const backcard = document.createElement('div');
+		backcard.className = 'card backcard';
+
+		if (playerCount == 2) {
+			p1.appendChild(backcard);
+		} else if (playerCount == 3) {
+			(userIndex + 1) % playerCount === affctedIndex
+				? p1.appendChild(backcard)
+				: p2.appendChild(backcard);
+		} else {
+			if ((userIndex + 1) % playerCount === affctedIndex) {
+				p3.appendChild(backcard);
+			} else if ((userIndex + 2) % playerCount === affctedIndex) {
+				p1.appendChild(backcard);
+			} else {
+				p2.appendChild(backcard);
+			}
+		}
+	}
+}
+
 async function onDrawCard() {
 	const result = await fetch(`/game/${gameId}/draw`, {
 		method: 'POST',
@@ -295,27 +318,29 @@ socket.on('draw card', async data => {
 
 	console.log('previous player index: ', previousPlayerIndex);
 
-	const backcard = document.createElement('div');
-	backcard.className = 'card backcard';
+	addBackCards(1, previousPlayerIndex, userIndex, data.userIdList.length);
 
-	if (data.userIdList.length == 2) {
-		p1.appendChild(backcard);
-	} else if (data.userIdList.length == 3) {
-		(userIndex + 1) % data.userIdList.length === previousPlayerIndex
-			? p1.appendChild(backcard)
-			: p2.appendChild(backcard);
-	} else {
-		if ((userIndex + 1) % data.userIdList.length === previousPlayerIndex) {
-			p3.appendChild(backcard);
-		} else if (
-			(userIndex + 2) % data.userIdList.length ===
-			previousPlayerIndex
-		) {
-			p1.appendChild(backcard);
-		} else {
-			p2.appendChild(backcard);
-		}
-	}
+	// const backcard = document.createElement('div');
+	// backcard.className = 'card backcard';
+
+	// if (data.userIdList.length == 2) {
+	// 	p1.appendChild(backcard);
+	// } else if (data.userIdList.length == 3) {
+	// 	(userIndex + 1) % data.userIdList.length === previousPlayerIndex
+	// 		? p1.appendChild(backcard)
+	// 		: p2.appendChild(backcard);
+	// } else {
+	// 	if ((userIndex + 1) % data.userIdList.length === previousPlayerIndex) {
+	// 		p3.appendChild(backcard);
+	// 	} else if (
+	// 		(userIndex + 2) % data.userIdList.length ===
+	// 		previousPlayerIndex
+	// 	) {
+	// 		p1.appendChild(backcard);
+	// 	} else {
+	// 		p2.appendChild(backcard);
+	// 	}
+	// }
 
 	updateBoard();
 });
@@ -374,6 +399,48 @@ socket.on('play card', async data => {
 				addCardToHand(data.neighbor.drawCards);
 			} else {
 				console.log('update backcards');
+
+				const userIndex = data.userIdList.findIndex(
+					uid => uid.user_id === body.uid
+				);
+				console.log('user index is: ', userIndex);
+
+				const neighborIndex = data.userIdList.findIndex(
+					uid => uid.user_id === data.neighbor.id
+				);
+
+				console.log('neighbor index: ', neighborIndex);
+
+				addBackCards(
+					data.neighbor.drawCount,
+					neighborIndex,
+					userIndex,
+					data.userIdList.length
+				);
+
+				// for (let i = 0; i < data.neighbor.drawCount; i++) {
+				// 	const backcard = document.createElement('div');
+				// 	backcard.className = 'card backcard';
+
+				// 	if (data.userIdList.length == 2) {
+				// 		p1.appendChild(backcard);
+				// 	} else if (data.userIdList.length == 3) {
+				// 		(userIndex + 1) % data.userIdList.length === neighborIndex
+				// 			? p1.appendChild(backcard)
+				// 			: p2.appendChild(backcard);
+				// 	} else {
+				// 		if ((userIndex + 1) % data.userIdList.length === neighborIndex) {
+				// 			p3.appendChild(backcard);
+				// 		} else if (
+				// 			(userIndex + 2) % data.userIdList.length ===
+				// 			neighborIndex
+				// 		) {
+				// 			p1.appendChild(backcard);
+				// 		} else {
+				// 			p2.appendChild(backcard);
+				// 		}
+				// 	}
+				// }
 			}
 		}
 	}
