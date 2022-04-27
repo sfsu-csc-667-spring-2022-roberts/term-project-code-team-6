@@ -294,7 +294,6 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		console.log('gameId is: ', gameId);
 		console.log('cardId is: ', cardId);
 		console.log('userId is: ', userId);
-		
 
 		// to-do check if player has that card
 
@@ -494,11 +493,8 @@ router.post('/:id/draw', authUser, async (req, res, next) => {
 		);
 		console.log('cardToAssgin in game.js: ', cardToAssgin);
 		console.log('Is reshuffle: ', reshuffle);
-		let query = 'SELECT *\
-		FROM cards\
-		WHERE id = $1';
-		const fetchedCard = await db.one(query, [cardToAssgin[0].card_id]);
-		console.log('Card info: ', fetchedCard);
+		const assignedCard = cardToAssgin[0];
+		console.log('Card info: ', assignedCard);
 
 		let updatedPlayerTurn =
 			(fetchedGame.clockwise
@@ -515,7 +511,7 @@ router.post('/:id/draw', authUser, async (req, res, next) => {
 
 		res.status(201).json({
 			message: 'card is drew',
-			card: fetchedCard,
+			card: assignedCard,
 			nextPlayerId: userIdList[updatedPlayerTurn].user_id,
 			drewBy: userId,
 			userIdList: userIdList,

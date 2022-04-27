@@ -2,8 +2,9 @@ const db = require('../db');
 
 async function drawCards(gameId, userId, count) {
 	let query =
-		'SELECT card_id\
+		'SELECT card_id, color, value\
 			FROM public.game_cards\
+            JOIN cards ON card_id = cards.id\
 			WHERE game_id = $1 AND user_id IS null AND discarded = false\
 			ORDER BY "order"\
 			LIMIT $2;';
