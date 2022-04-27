@@ -293,6 +293,8 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		const userId = req.session.userId;
 		console.log('gameId is: ', gameId);
 		console.log('cardId is: ', cardId);
+		console.log('userId is: ', userId);
+		
 
 		// to-do check if player has that card
 
@@ -382,7 +384,7 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		await db.any(query, [newOrder, rotate, gameId, cardId]);
 
 		let updatedPlayerTurn = fetchedGame.player_turn;
-		let neighbor = '';
+		let neighbor = {};
 		while (turnToNextPlayer > 0) {
 			updatedPlayerTurn =
 				(clockwise ? updatedPlayerTurn - 1 : updatedPlayerTurn + 1) %
@@ -391,7 +393,7 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 				updatedPlayerTurn < 0 ? fetchedGame.userCount - 1 : updatedPlayerTurn;
 
 			// get the neighbor user id not the next player that start the turn
-			if (!neighbor) neighbor = userIdList[updatedPlayerTurn].user_id;
+			if (!neighbor.id) neighbor.id = userIdList[updatedPlayerTurn].user_id;
 			turnToNextPlayer--;
 		}
 
@@ -405,10 +407,16 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		);
 
 		if (hasDraw) {
-			console.log(`draw card type: ${hasDraw} and target id: ${neighbor}`);
-			hasDraw === 'draw4'
-				? cardDao.drawCards(gameId, neighbor, 4)
-				: cardDao.drawCards(gameId, neighbor, 2);
+			console.log(
+				`draw card type: ${hasDraw} and target player id: ${neighbor.id}`
+			);
+			if (hasDraw === 'draw4') {
+				neighbor.drawCount = 4;
+				cardDao.drawCards(gameId, neighbor.id, 4);
+			} else if (hasDraw === 'draw2') {
+				neighbor.drawCount = 2;
+				cardDao.drawCards(gameId, neighbor.id, 2);
+			}
 		}
 
 		query =
@@ -451,6 +459,8 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 			yourTurn: userIdList[updatedPlayerTurn].user_id === userId,
 			username: username,
 			wildFlag: wildFlag,
+			userId: userId,
+			neighbor: neighbor,
 		});
 	} catch (err) {
 		next(err);

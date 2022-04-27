@@ -56,7 +56,7 @@ function createYourTurn() {
 	gameRoomDiv.appendChild(yourTurnElm);
 }
 
-async function onCardPlay(cardId) {
+async function onPlayCard(cardId) {
 	const result = await fetch(`/game/${gameId}/play/` + cardId, {
 		method: 'POST',
 	});
@@ -70,6 +70,48 @@ async function onCardPlay(cardId) {
 
 	const card = document.getElementById(cardId);
 	createNewDiscardedCard(card.className, cardId, body.rotate);
+
+	////
+
+	if (body.neighbor.drawCount) {
+		const userIndex = body.userIdList.findIndex(
+			uid => uid.user_id === body.userId
+		);
+		console.log('user index is: ', userIndex);
+
+		const neighborIndex = body.userIdList.findIndex(
+			uid => uid.user_id === body.neighbor.id
+		);
+
+		console.log('previous player index: ', neighborIndex);
+
+		const p1 = document.getElementById('p1');
+		const p2 = document.getElementById('p2');
+		const p3 = document.getElementById('p3');
+
+		for (let i = 0; i < body.neighbor.drawCount; i++) {
+			const backcard = document.createElement('div');
+			backcard.className = 'card backcard';
+
+			if (body.userIdList.length == 2) {
+				p1.appendChild(backcard);
+			} else if (body.userIdList.length == 3) {
+				(userIndex + 1) % body.userIdList.length === neighborIndex
+					? p1.appendChild(backcard)
+					: p2.appendChild(backcard);
+			} else {
+				if ((userIndex + 1) % body.userIdList.length === neighborIndex) {
+					p3.appendChild(backcard);
+				} else if ((userIndex + 2) % body.userIdList.length === neighborIndex) {
+					p1.appendChild(backcard);
+				} else {
+					p2.appendChild(backcard);
+				}
+			}
+		}
+	}
+
+	////
 
 	card.remove();
 
@@ -124,7 +166,7 @@ async function onDrawCard() {
 	const newCard = document.createElement('div');
 	newCard.className = `card ${body.card.color}-${body.card.value}`;
 	newCard.id = body.card.id;
-	newCard.addEventListener('click', () => onCardPlay(body.card.id));
+	newCard.addEventListener('click', () => onPlayCard(body.card.id));
 	userCards.appendChild(newCard);
 
 	removeYourTurn();
@@ -183,7 +225,7 @@ if (userCards && deck && gameId) {
 if (userCards && gameId) {
 	for (let card of userCards.children) {
 		let cardId = card.id;
-		card.addEventListener('click', () => onCardPlay(cardId));
+		card.addEventListener('click', () => onPlayCard(cardId));
 	}
 }
 
