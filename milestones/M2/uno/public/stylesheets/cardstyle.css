@@ -383,15 +383,43 @@
 
 .discarded-cards {
 	position: absolute;
-	width: 80px;
-	height: 126px;
+	display: flex;
+	width: 200px;
+	height: 200px;
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
+	justify-content: center;
+	align-items: center;
+	border-radius: 50%;
+	border: 20px solid;
+	box-sizing: border-box;
+}
+
+.discarded-cards__wild {
+	border-color: #fff;
+}
+
+.discarded-cards__red {
+	border-color: #ed1c24;
+}
+
+.discarded-cards__blue {
+	border-color: #0072bc;
+}
+
+.discarded-cards__yellow {
+	border-color: #ffde16;
+}
+
+.discarded-cards__green {
+	border-color: #50aa44;
 }
 
 .discarded-cards_container {
 	position: relative;
+	width: 80px;
+	height: 126px;
 }
 
 .discarded-cards_container .card {
@@ -401,7 +429,7 @@
 #deck {
 	position: absolute;
 	top: 50%;
-	left: 65%;
-	transform: translateY(-50%);
+	left: 50%;
+	transform: translate(calc(-50% + 180px), -50%);
 	cursor: pointer;
 }

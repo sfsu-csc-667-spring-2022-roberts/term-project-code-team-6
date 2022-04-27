@@ -11,6 +11,7 @@ if (gameId) socket.emit('join room', { gameId: gameId });
 
 const gameRoomDiv = document.getElementById('game-room');
 const userCount = document.getElementById('user-count');
+const discardedDiv = document.getElementById('discarded-cards');
 
 const playerCards = document.getElementsByClassName('hand');
 const p1 = document.getElementById('p1');
@@ -83,12 +84,14 @@ async function onUpdateColor(body, color, popUpDiv) {
 	console.log(msg);
 	if (!msg.yourTurn) removeYourTurn();
 
+	updateRingColor(color);
+
 	popUpDiv.remove();
 	body.nextPlayerId = msg.nextPlayerId;
 	socket.emit('play card', {
 		id: body.cardId,
 		gameId: gameId,
-		color: body.color,
+		color: color,
 		value: body.value,
 		rotate: body.rotate,
 		nextPlayerId: body.nextPlayerId,
@@ -239,7 +242,8 @@ async function onPlayCard(cardId) {
 
 	updateBoard();
 
-	if (!body.wildFlag)
+	if (!body.wildFlag) {
+		updateRingColor(body.color);
 		socket.emit('play card', {
 			id: body.cardId,
 			gameId: gameId,
@@ -252,6 +256,7 @@ async function onPlayCard(cardId) {
 			winner: body.youWin ? body.username : null,
 			neighbor: body.neighbor,
 		});
+	}
 }
 
 function addCardToHand(cards) {
@@ -323,6 +328,28 @@ function stopTheGame() {
 	if (deck) {
 		deck.removeEventListener('click', onDrawCard);
 	}
+}
+
+function updateRingColor(color) {
+	console.log('color is: ', color);
+	let rgb = '';
+	switch (color) {
+		case 'red':
+			rgb = '#ed1c24';
+			break;
+		case 'blue':
+			rgb = '#0072bc';
+			break;
+		case 'green':
+			rgb = '#50aa44';
+			break;
+		case 'yellow':
+			rgb = '#ffde16';
+			break;
+		default:
+			rgb = '#fff';
+	}
+	discardedDiv.style.borderColor = rgb;
 }
 
 const startBtn = document.getElementById('start-game');
@@ -438,6 +465,8 @@ socket.on('play card', async data => {
 	const result = await fetch('/userInfo');
 	const body = await result.json();
 	console.log(body);
+
+	updateRingColor(data.color);
 
 	if (!data.winner && data.nextPlayerId === body.uid) {
 		createYourTurn();

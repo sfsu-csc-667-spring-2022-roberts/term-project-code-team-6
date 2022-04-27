@@ -28,7 +28,7 @@
 					<div id={{id}} class='card {{color}}-{{value}}'></div>
 				{{/each}}
 			</div>
-			<div class='discarded-cards'>
+			<div id="discarded-cards" class='discarded-cards discarded-cards__{{currColor}}'>
 				<div id='discarded-cards_container' class='discarded-cards_container'>
 					{{#each discardedCards}}
 						<div

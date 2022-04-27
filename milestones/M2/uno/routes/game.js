@@ -167,6 +167,7 @@ router.get('/:id', authUser, async (req, res, next) => {
 				active: fetchedGame.active,
 				gameId: fetchedGame.id,
 				isUserTurn: fetchedGame.player_turn === userIndex,
+				currColor: fetchedGame.curr_color,
 			});
 		} else {
 			if (fetchedPlayer) {
@@ -277,9 +278,6 @@ router.post('/:id/start', authUser, async (req, res, next) => {
 		}
 
 		socketApi.io.emit('start game', { message: 'Game started' });
-
-		// Redirect to /game/{id}
-		// res.redirect('/game/' + gameId);
 	} catch (err) {
 		next(err);
 	}
@@ -402,23 +400,32 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		}
 
 		query =
-			'UPDATE games\
-				SET "discardedCount" = $1, player_turn = $2, curr_color = $3, curr_value = $4, clockwise = $5\
-				WHERE id = $6;';
-		await db.any(query, [
-			fetchedGame.discardedCount + 1,
-			updatedPlayerTurn,
-			fetchedCard.color,
-			fetchedCard.value,
-			clockwise,
-			gameId,
-		]);
-
-		query =
 			'SELECT COUNT(*)\
-			FROM game_cards\
-			WHERE game_id = $1 AND user_id = $2';
+		FROM game_cards\
+		WHERE game_id = $1 AND user_id = $2';
 		const { count } = await db.one(query, [gameId, userId]);
+		let isGameFinished = count === '0';
+		if (isGameFinished) {
+			// resetting game
+			query =
+				'UPDATE games\
+						SET "discardedCount" = 0, player_turn = 0, curr_color = wild, curr_value = wild, clockwise = false\
+						WHERE id = $1;';
+			await db.any(query, [gameId]);
+		} else {
+			query =
+				'UPDATE games\
+							SET "discardedCount" = $1, player_turn = $2, curr_color = $3, curr_value = $4, clockwise = $5\
+							WHERE id = $6;';
+			await db.any(query, [
+				fetchedGame.discardedCount + 1,
+				updatedPlayerTurn,
+				fetchedCard.color,
+				fetchedCard.value,
+				clockwise,
+				gameId,
+			]);
+		}
 
 		query = 'SELECT username\
 			FROM users\

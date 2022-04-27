@@ -300,6 +300,16 @@ a {
 	align-items: center;
 }
 
+.color-picker::before {
+	content: 'Choose a color';
+	position: absolute;
+	top: calc(50% - 130px);
+	z-index: 100;
+	font-size: 2rem;
+	color: #fff;
+	font-family: 'Luckiest Guy', cursive;
+}
+
 .color-picker div {
 	width: 100px;
 	height: 100px;
