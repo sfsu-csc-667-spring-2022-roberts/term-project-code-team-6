@@ -48,6 +48,27 @@ async function drawCards(gameId, userId, count) {
 	};
 }
 
+async function shuffleCards(gameId) {
+	let order = [];
+	for (let i = 0; i < 108; i++) order.push(i + 1);
+
+	for (let i = 0; i < 108; i++) {
+		let rnd = Math.floor(Math.random() * 30);
+		let temp = order[i];
+		order[i] = order[rnd];
+		order[rnd] = temp;
+	}
+
+	let query = `INSERT INTO game_cards (game_id, card_id, "order") VALUES (${gameId}, ${1}, ${
+		order[0]
+	})`;
+	for (let i = 1; i < 108; i++) {
+		query += `, (${gameId}, ${i + 1}, ${order[i]})`;
+	}
+	await db.any(query, []);
+}
+
 module.exports = {
 	drawCards,
+	shuffleCards
 };

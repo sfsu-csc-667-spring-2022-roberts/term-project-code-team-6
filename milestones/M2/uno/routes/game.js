@@ -34,23 +34,25 @@ router.post(
 				'INSERT INTO game_users (game_id, user_id, "isReady", player_order) VALUES ($1, $2, true, 1);';
 			await db.any(query, [gameId, userId]);
 
-			let order = [];
-			for (let i = 0; i < 108; i++) order.push(i + 1);
+			await cardDao.shuffleCards(gameId);
 
-			for (let i = 0; i < 108; i++) {
-				let rnd = Math.floor(Math.random() * 30);
-				let temp = order[i];
-				order[i] = order[rnd];
-				order[rnd] = temp;
-			}
+			// let order = [];
+			// for (let i = 0; i < 108; i++) order.push(i + 1);
 
-			query = `INSERT INTO game_cards (game_id, card_id, "order") VALUES (${gameId}, ${1}, ${
-				order[0]
-			})`;
-			for (let i = 1; i < 108; i++) {
-				query += `, (${gameId}, ${i + 1}, ${order[i]})`;
-			}
-			await db.any(query, []);
+			// for (let i = 0; i < 108; i++) {
+			// 	let rnd = Math.floor(Math.random() * 30);
+			// 	let temp = order[i];
+			// 	order[i] = order[rnd];
+			// 	order[rnd] = temp;
+			// }
+
+			// query = `INSERT INTO game_cards (game_id, card_id, "order") VALUES (${gameId}, ${1}, ${
+			// 	order[0]
+			// })`;
+			// for (let i = 1; i < 108; i++) {
+			// 	query += `, (${gameId}, ${i + 1}, ${order[i]})`;
+			// }
+			// await db.any(query, []);
 
 			res.status(201).json({ title, userId, gameId });
 		} catch (err) {
@@ -409,9 +411,15 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 			// resetting game
 			query =
 				'UPDATE games\
-						SET "discardedCount" = 0, player_turn = 0, curr_color = wild, curr_value = wild, clockwise = false\
-						WHERE id = $1;';
+				SET active = false, "discardedCount" = 0, player_turn = 0, clockwise = false, curr_color = $1, curr_value = $2\
+				WHERE id = $3';
+			await db.any(query, ['wild', 'wild', gameId]);
+
+			query = 'DELETE FROM game_cards\
+				WHERE game_id = $1';
 			await db.any(query, [gameId]);
+
+			await cardDao.shuffleCards(gameId);
 		} else {
 			query =
 				'UPDATE games\

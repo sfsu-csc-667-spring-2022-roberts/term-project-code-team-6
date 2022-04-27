@@ -91,7 +91,8 @@ async function onUpdateColor(body, color, popUpDiv) {
 	socket.emit('play card', {
 		id: body.cardId,
 		gameId: gameId,
-		color: color,
+		color: body.color,
+		selectedColor: color,
 		value: body.value,
 		rotate: body.rotate,
 		nextPlayerId: body.nextPlayerId,
@@ -332,24 +333,24 @@ function stopTheGame() {
 
 function updateRingColor(color) {
 	console.log('color is: ', color);
-	let rgb = '';
-	switch (color) {
-		case 'red':
-			rgb = '#ed1c24';
-			break;
-		case 'blue':
-			rgb = '#0072bc';
-			break;
-		case 'green':
-			rgb = '#50aa44';
-			break;
-		case 'yellow':
-			rgb = '#ffde16';
-			break;
-		default:
-			rgb = '#fff';
-	}
-	discardedDiv.style.borderColor = rgb;
+	// let rgb = '';
+	// switch (color) {
+	// 	case 'red':
+	// 		rgb = '#ed1c24';
+	// 		break;
+	// 	case 'blue':
+	// 		rgb = '#0072bc';
+	// 		break;
+	// 	case 'green':
+	// 		rgb = '#50aa44';
+	// 		break;
+	// 	case 'yellow':
+	// 		rgb = '#ffde16';
+	// 		break;
+	// 	default:
+	// 		rgb = '#fff';
+	// }
+	discardedDiv.className = `discarded-cards discarded-cards__${color}`;
 }
 
 const startBtn = document.getElementById('start-game');
@@ -466,7 +467,10 @@ socket.on('play card', async data => {
 	const body = await result.json();
 	console.log(body);
 
-	updateRingColor(data.color);
+
+	data.selectedColor
+		? updateRingColor(data.selectedColor)
+		: updateRingColor(data.color);
 
 	if (!data.winner && data.nextPlayerId === body.uid) {
 		createYourTurn();
