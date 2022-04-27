@@ -504,7 +504,7 @@ router.post('/:id/draw', authUser, async (req, res, next) => {
 			updatedPlayerTurn < 0 ? fetchedGame.userCount - 1 : updatedPlayerTurn;
 		console.log('updated player turn: ', updatedPlayerTurn);
 
-		query = 'UPDATE games\
+		let query = 'UPDATE games\
 			SET player_turn = $1\
 			WHERE id = $2;';
 		await db.any(query, [updatedPlayerTurn, gameId]);

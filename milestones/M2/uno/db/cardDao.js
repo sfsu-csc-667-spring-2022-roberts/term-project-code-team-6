@@ -21,13 +21,17 @@ async function drawCards(gameId, userId, count) {
             WHERE game_id = $1;';
 		await db.any(query, [gameId]);
 
-        // to-do set discard to 0
-
+		// set discard to 0
+		query =
+			'UPDATE games\
+            SET discardedCount = 0\
+            WHERE game_id = $1;';
+		await db.any(query, [gameId]);
 
 		const retObj = await drawCards(gameId, userId, count);
 		retObj.reshuffle = true;
 		console.log(retObj);
-		return retObj; 
+		return retObj;
 	}
 
 	for (let i = 0; i < count; i++) {
