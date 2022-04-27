@@ -348,6 +348,7 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 
 		let turnToNextPlayer = 1;
 		let wildFlag = '';
+		let hasDraw = '';
 		let clockwise = fetchedGame.clockwise;
 		if (fetchedCard.value === 'wild') {
 			console.log('wild card played');
@@ -362,6 +363,9 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 			if (fetchedCard.value === 'draw4') {
 				console.log('draw4 played');
 				wildFlag = 'draw4';
+				hasDraw = 'draw4';
+			} else if (fetchedCard.value === 'draw2') {
+				hasDraw = 'draw2';
 			}
 		} else if (fetchedCard.value === 'reverse') {
 			console.log('reverse played');
@@ -378,19 +382,35 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		await db.any(query, [newOrder, rotate, gameId, cardId]);
 
 		let updatedPlayerTurn = fetchedGame.player_turn;
-		while (!wildFlag && turnToNextPlayer > 0) {
+		let neighbor = '';
+		while (turnToNextPlayer > 0) {
 			updatedPlayerTurn =
 				(clockwise ? updatedPlayerTurn - 1 : updatedPlayerTurn + 1) %
 				fetchedGame.userCount;
 			updatedPlayerTurn =
 				updatedPlayerTurn < 0 ? fetchedGame.userCount - 1 : updatedPlayerTurn;
+
+			// get the neighbor user id not the next player that start the turn
+			if (!neighbor) neighbor = userIdList[updatedPlayerTurn].user_id;
 			turnToNextPlayer--;
 		}
+
+		// the turn is still on the current player untill they choose a color
+		if (wildFlag) updatedPlayerTurn = fetchedGame.player_turn;
+
 		console.log('updated player turn: ', updatedPlayerTurn);
 		console.log(
 			"It is still this player's turn? ",
 			userIdList[updatedPlayerTurn].user_id === userId
 		);
+
+		if (hasDraw) {
+			console.log(`draw card type: ${hasDraw} and target id: ${neighbor}`);
+			hasDraw === 'draw4'
+				? cardDao.drawCards(gameId, neighbor, 4)
+				: cardDao.drawCards(gameId, neighbor, 2);
+		}
+
 		query =
 			'UPDATE games\
 				SET "discardedCount" = $1, player_turn = $2, curr_color = $3, curr_value = $4, clockwise = $5\
