@@ -1,55 +1,64 @@
 <link rel='stylesheet' href='../stylesheets/cardstyle.css' />
 <div class='landing-top'>
-	<p id="user-count" >{{userCount}} playing</p>
+	<p id='user-count'>{{userCount}} playing</p>
 	{{#unless active}}
 		<button id='start-game' class='secondary-btn'>Start</button>
 	{{/unless}}
 </div>
 <div id={{gameId}} class='game'>
-		<div id="game-room" class='game-room'>
-			{{#if active}}
-					<div id="p1" class='hand player-one'>
-						{{#each playerCards.p1}}
-							<div class='card backcard'></div>
-						{{/each}}
-					</div>
-					<div id="p2" class='hand player-two'>
-						{{#each playerCards.p2}}
-							<div class='card backcard'></div>
-						{{/each}}
-					</div>
-					<div id="p3" class='hand player-three'>
-						{{#each playerCards.p3}}
-							<div class='card backcard'></div>
-						{{/each}}
-					</div>
-					<div id="user-cards" class='hand user'>
-						{{#each playerCards.user}}
-							<div id={{id}} class='card {{color}}-{{value}}'></div>
-						{{/each}}
-					</div>
-					<div class='discarded-cards'>
-						<div id="discarded-cards_container" class ='discarded-cards_container'>
-							{{#each discardedCards}}
-								<div id={{id}} class='card {{color}}-{{value}}' style="transform: rotate({{rotate}}deg)"></div>
-							{{/each}}
-						</div>
-					</div>
-					<div id="deck" class='card backcard'></div>
-					{{#if isUserTurn}}
-						<h1 id="your-turn">Your turn</h1>
-					{{/if}}
-			{{else}}
-				{{#each players}}
-					<div class="game-lobby_user">
-						<p>uid: {{uid}}</p>
-						<p>username: {{username}}</p>
-						<p>ready: {{isReady}}</p>
-					</div>
+	<div id='game-room' class='game-room'>
+		{{#if active}}
+			<div id='p1' class='hand player-one'>
+				{{#each playerCards.p1}}
+					<div class='card backcard'></div>
 				{{/each}}
+			</div>
+			<div id='p2' class='hand player-two'>
+				{{#each playerCards.p2}}
+					<div class='card backcard'></div>
+				{{/each}}
+			</div>
+			<div id='p3' class='hand player-three'>
+				{{#each playerCards.p3}}
+					<div class='card backcard'></div>
+				{{/each}}
+			</div>
+			<div id='user-cards' class='hand user'>
+				{{#each playerCards.user}}
+					<div id={{id}} class='card {{color}}-{{value}}'></div>
+				{{/each}}
+			</div>
+			<div class='discarded-cards'>
+				<div id='discarded-cards_container' class='discarded-cards_container'>
+					{{#each discardedCards}}
+						<div
+							id={{id}}
+							class='card {{color}}-{{value}}'
+							style='transform: rotate({{rotate}}deg)'
+						></div>
+					{{/each}}
+				</div>
+			</div>
+			<div id='deck' class='card backcard'></div>
+			{{#if isUserTurn}}
+				<h1 class="your-turn" id='your-turn'>Your turn</h1>
 			{{/if}}
-		</div>
-	<div>
+			{{!-- <div id="color-popup" class='color-popup'>
+				<div class='color-picker'>
+					<div id='red'></div>
+					<div id='blue'></div>
+					<div id='green'></div>
+				</div>
+			</div> --}}
+		{{else}}
+			{{#each players}}
+				<div class='game-lobby_user'>
+					<p>uid: {{uid}}</p>
+					<p>username: {{username}}</p>
+					<p>ready: {{isReady}}</p>
+				</div>
+			{{/each}}
+		{{/if}}
 	</div>
-	{{> chat}}
+	{{!-- {{> chat}} --}}
 </div>

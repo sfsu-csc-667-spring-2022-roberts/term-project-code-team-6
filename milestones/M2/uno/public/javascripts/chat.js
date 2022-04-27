@@ -15,25 +15,27 @@ function createChatDiv(username, message) {
 	messages.appendChild(chatDiv);
 }
 
-form.addEventListener('submit', async function (e) {
-	e.preventDefault();
-	console.log(input.value);
-	if (input.value) {
-		const result = await fetch('/userInfo');
-		const body = await result.json();
-		console.log(body);
-		const destination = gameId ? 'room' + gameId : 'lobby';
-		socket.emit('chat message', {
-			destination: destination,
-			username: body.username,
-			message: input.value,
-		});
+if (form) {
+	form.addEventListener('submit', async function (e) {
+		e.preventDefault();
+		console.log(input.value);
+		if (input.value) {
+			const result = await fetch('/userInfo');
+			const body = await result.json();
+			console.log(body);
+			const destination = gameId ? 'room' + gameId : 'lobby';
+			socket.emit('chat message', {
+				destination: destination,
+				username: body.username,
+				message: input.value,
+			});
 
-		createChatDiv(body.username, input.value);
+			createChatDiv(body.username, input.value);
 
-		input.value = '';
-	}
-});
+			input.value = '';
+		}
+	});
+}
 
 socket.on('chat message', data => {
 	console.log('on chat message');

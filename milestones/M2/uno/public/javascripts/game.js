@@ -67,7 +67,36 @@ function createYourTurn() {
 	const yourTurnElm = document.createElement('h1');
 	yourTurnElm.innerText = 'Your turn';
 	yourTurnElm.id = 'your-turn';
+	yourTurnElm.className = 'your-turn';
 	gameRoomDiv.appendChild(yourTurnElm);
+}
+
+async function onUpdateColor(body, color, popUpDiv) {
+	console.log(color, ' is clicked');
+	const result = await fetch(
+		`/game/${gameId}/wild/${body.wildFlag}/color/` + color,
+		{
+			method: 'POST',
+		}
+	);
+	const msg = await result.json();
+	console.log(msg);
+	if (!msg.yourTurn) removeYourTurn();
+
+	popUpDiv.remove();
+	body.nextPlayerId = msg.nextPlayerId;
+	socket.emit('play card', {
+		id: body.cardId,
+		gameId: gameId,
+		color: body.color,
+		value: body.value,
+		rotate: body.rotate,
+		nextPlayerId: body.nextPlayerId,
+		playedBy: body.playedBy,
+		userIdList: body.userIdList,
+		winner: body.youWin ? body.username : null,
+		neighbor: body.neighbor,
+	});
 }
 
 async function onPlayCard(cardId) {
@@ -85,8 +114,6 @@ async function onPlayCard(cardId) {
 	const card = document.getElementById(cardId);
 	createNewDiscardedCard(card.className, cardId, body.rotate);
 
-	////
-
 	if (body.neighbor.drawCount) {
 		const userIndex = body.userIdList.findIndex(
 			uid => uid.user_id === body.userId
@@ -97,35 +124,40 @@ async function onPlayCard(cardId) {
 			uid => uid.user_id === body.neighbor.id
 		);
 
-		console.log('previous player index: ', neighborIndex);
+		console.log('neighborIndex index: ', neighborIndex);
+
+		addBackCards(
+			body.neighbor.drawCount,
+			neighborIndex,
+			userIndex,
+			body.userIdList.length
+		);
 
 		// const p1 = document.getElementById('p1');
 		// const p2 = document.getElementById('p2');
 		// const p3 = document.getElementById('p3');
 
-		for (let i = 0; i < body.neighbor.drawCount; i++) {
-			const backcard = document.createElement('div');
-			backcard.className = 'card backcard';
+		// for (let i = 0; i < body.neighbor.drawCount; i++) {
+		// 	const backcard = document.createElement('div');
+		// 	backcard.className = 'card backcard';
 
-			if (body.userIdList.length == 2) {
-				p1.appendChild(backcard);
-			} else if (body.userIdList.length == 3) {
-				(userIndex + 1) % body.userIdList.length === neighborIndex
-					? p1.appendChild(backcard)
-					: p2.appendChild(backcard);
-			} else {
-				if ((userIndex + 1) % body.userIdList.length === neighborIndex) {
-					p3.appendChild(backcard);
-				} else if ((userIndex + 2) % body.userIdList.length === neighborIndex) {
-					p1.appendChild(backcard);
-				} else {
-					p2.appendChild(backcard);
-				}
-			}
-		}
+		// 	if (body.userIdList.length == 2) {
+		// 		p1.appendChild(backcard);
+		// 	} else if (body.userIdList.length == 3) {
+		// 		(userIndex + 1) % body.userIdList.length === neighborIndex
+		// 			? p1.appendChild(backcard)
+		// 			: p2.appendChild(backcard);
+		// 	} else {
+		// 		if ((userIndex + 1) % body.userIdList.length === neighborIndex) {
+		// 			p3.appendChild(backcard);
+		// 		} else if ((userIndex + 2) % body.userIdList.length === neighborIndex) {
+		// 			p1.appendChild(backcard);
+		// 		} else {
+		// 			p2.appendChild(backcard);
+		// 		}
+		// 	}
+		// }
 	}
-
-	////
 
 	card.remove();
 
@@ -139,34 +171,79 @@ async function onPlayCard(cardId) {
 
 	if (!body.youWin && body.wildFlag) {
 		console.log('Get user color input');
-		const result = await fetch(
-			`/game/${gameId}/wild/${body.wildFlag}/color/` + 'red',
-			{
-				method: 'POST',
-			}
+		// const result = await fetch(
+		// 	`/game/${gameId}/wild/${body.wildFlag}/color/` + 'red',
+		// 	{
+		// 		method: 'POST',
+		// 	}
+		// );
+		// const msg = await result.json();
+
+		const colorPopup = document.createElement('div');
+		colorPopup.className = 'color-popup';
+
+		const colorPicker = document.createElement('div');
+		colorPicker.className = 'color-picker';
+
+		const redPicker = document.createElement('div');
+		redPicker.addEventListener('click', () =>
+			onUpdateColor(body, 'red', colorPopup)
 		);
-		const msg = await result.json();
-		console.log(msg);
+		redPicker.className = 'redPicker';
 
-		if (!msg.yourTurn) removeYourTurn();
+		const bluePicker = document.createElement('div');
+		bluePicker.addEventListener('click', () =>
+			onUpdateColor(body, 'blue', colorPopup)
+		);
+		bluePicker.className = 'bluePicker';
 
-		body.nextPlayerId = msg.nextPlayerId;
+		const greenPicker = document.createElement('div');
+		greenPicker.addEventListener('click', () =>
+			onUpdateColor(body, 'green', colorPopup)
+		);
+		greenPicker.className = 'greenPicker';
+
+		colorPicker.append(redPicker);
+		colorPicker.append(bluePicker);
+		colorPicker.append(greenPicker);
+		colorPopup.append(colorPicker);
+		gameRoomDiv.append(colorPopup);
+
+		// const msg = await onUpdateColor(body, 'blue');
+		// console.log(msg);
+
+		// if (!msg.yourTurn) removeYourTurn();
+
+		// body.nextPlayerId = msg.nextPlayerId;
+		// socket.emit('play card', {
+		// 	id: body.cardId,
+		// 	gameId: gameId,
+		// 	color: body.color,
+		// 	value: body.value,
+		// 	rotate: body.rotate,
+		// 	nextPlayerId: body.nextPlayerId,
+		// 	playedBy: body.playedBy,
+		// 	userIdList: body.userIdList,
+		// 	winner: body.youWin ? body.username : null,
+		// 	neighbor: body.neighbor,
+		// });
 	}
 
 	updateBoard();
 
-	socket.emit('play card', {
-		id: body.cardId,
-		gameId: gameId,
-		color: body.color,
-		value: body.value,
-		rotate: body.rotate,
-		nextPlayerId: body.nextPlayerId,
-		playedBy: body.playedBy,
-		userIdList: body.userIdList,
-		winner: body.youWin ? body.username : null,
-		neighbor: body.neighbor,
-	});
+	if (!body.wildFlag)
+		socket.emit('play card', {
+			id: body.cardId,
+			gameId: gameId,
+			color: body.color,
+			value: body.value,
+			rotate: body.rotate,
+			nextPlayerId: body.nextPlayerId,
+			playedBy: body.playedBy,
+			userIdList: body.userIdList,
+			winner: body.youWin ? body.username : null,
+			neighbor: body.neighbor,
+		});
 }
 
 function addCardToHand(cards) {

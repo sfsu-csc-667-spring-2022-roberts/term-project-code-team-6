@@ -348,13 +348,14 @@
 	display: flex;
 	position: absolute;
 	left: 50%;
-	bottom: 0;
+	bottom: 1rem;
 	/* transform: translateX(-265px);	 */
 	/* overflow: scroll; */
 }
 .player-one {
 	position: absolute;
 	display: flex;
+	top: 1rem;
 	left: 50%;
 	transform: translateX(-50%);
 	/* overflow: scroll; */
@@ -364,7 +365,7 @@
 	position: absolute;
 	display: flex;
 	top: 50%;
-	left: 0;
+	left: 1rem;
 	transform-origin: bottom left;
 	/* transform: translateX(-35%) rotate(90deg); */
 	/* overflow: scroll; */
@@ -374,7 +375,7 @@
 	position: absolute;
 	display: flex;
 	top: 50%;
-	right: 0;
+	right: 1rem;
 	transform-origin: bottom left;
 	/* transform: rotate(-90deg) translateX(); */
 	/* overflow: scroll; */

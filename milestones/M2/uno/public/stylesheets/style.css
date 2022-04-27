@@ -44,7 +44,6 @@ a {
 	margin-left: 3em;
 }
 
-
 .secondary-btn {
 	padding: 1rem 2rem;
 	background-color: var(--secondary-color);
@@ -256,9 +255,8 @@ a {
 	width: 100%;
 	height: 100%;
 	overflow: auto;
-	background-color: rgb(0,0,0);
-	background-color: rgb(0,0,0,0.4);
-
+	background-color: rgb(0, 0, 0);
+	background-color: rgb(0, 0, 0, 0.4);
 }
 
 .howToModal-content {
@@ -281,4 +279,44 @@ a {
 	color: black;
 	text-decoration: none;
 	cursor: pointer;
+}
+
+.color-popup {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: rgb(0, 0, 0, 0.4);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.color-picker {
+	height: 126px;
+	width: 500px;
+	background-color: white;
+	display: flex;
+	justify-content: space-evenly;
+	align-items: center;
+}
+
+.color-picker div {
+	width: 100px;
+	height: 100px;
+}
+
+.redPicker {
+	background-color: red;
+}
+
+.bluePicker {
+	background-color: blue;
+}
+
+.greenPicker {
+	background-color: green;
+}
+
+.your-turn {
+	position: absolute;
 }
