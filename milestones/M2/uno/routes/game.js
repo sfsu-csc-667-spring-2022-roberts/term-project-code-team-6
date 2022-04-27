@@ -392,15 +392,13 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 			console.log(
 				`draw card type: ${hasDraw} and target player id: ${neighbor.id}`
 			);
-			if (hasDraw === 'draw4') {
-				neighbor.drawCount = hasDraw === 'draw4' ? 4 : 2;
-				const { cardToAssgin } = await cardDao.drawCards(
-					gameId,
-					neighbor.id,
-					neighbor.drawCount
-				);
-				neighbor.drawCards = cardToAssgin;
-			}
+			neighbor.drawCount = hasDraw === 'draw4' ? 4 : 2;
+			const { cardToAssgin } = await cardDao.drawCards(
+				gameId,
+				neighbor.id,
+				neighbor.drawCount
+			);
+			neighbor.drawCards = cardToAssgin;
 		}
 
 		query =
