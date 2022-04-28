@@ -18,7 +18,11 @@ async function checkUserTurn(gameId, userId) {
 	console.log('Game info: ', fetchedGame);
 	console.log('Total discarded cards: ', fetchedGame.discardedCount);
 
-	console.log(userIndex, fetchedGame.player_turn, userIndex === fetchedGame.player_turn);
+	console.log(
+		userIndex,
+		fetchedGame.player_turn,
+		userIndex === fetchedGame.player_turn
+	);
 
 	return {
 		isUserTurn: userIndex === fetchedGame.player_turn,
@@ -27,6 +31,14 @@ async function checkUserTurn(gameId, userId) {
 	};
 }
 
+async function updatePlayerTurn(updatedPlayerTurn, gameId) {
+	let query = 'UPDATE games\
+	SET player_turn = $1\
+	WHERE id = $2;';
+	await db.any(query, [updatedPlayerTurn, gameId]);
+}
+
 module.exports = {
 	checkUserTurn,
+	updatePlayerTurn,
 };
