@@ -170,6 +170,7 @@ router.get('/:id', authUser, async (req, res, next) => {
 				gameId: fetchedGame.id,
 				isUserTurn: fetchedGame.player_turn === userIndex,
 				currColor: fetchedGame.curr_color,
+				isCardPlayed: fetchedPlayer.isCardPlayed,
 			});
 		} else {
 			if (fetchedPlayer) {
@@ -365,6 +366,11 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		const rotate = Math.floor(Math.random() * 23) * 15; // rotate(0 deg to 359 deg)
 		await db.any(query, [newOrder, rotate, gameId, cardId]);
 
+		query =
+			'UPDATE game_users\
+			SET "isCardPlayed" = true WHERE game_id = $1 AND user_id = $2;';
+			await db.any(query, [gameId, userId]);
+
 		let updatedPlayerTurn = fetchedGame.player_turn;
 		let neighbor = {};
 		while (turnToNextPlayer > 0) {
@@ -473,17 +479,30 @@ router.post('/:id/draw', authUser, async (req, res, next) => {
 		console.log('gameId is: ', gameId);
 		console.log('userId is: ', userId);
 
-		const { isUserTurn, fetchedGame, userIdList } = await gameDao.checkUserTurn(
+		const { isUserTurn, userIdList } = await gameDao.checkUserTurn(
 			gameId,
 			userId
 		);
 		console.log('isUserTurn: ', isUserTurn);
+
 		if (!isUserTurn) {
 			return res.status(200).json({
 				message: "Cannot not draw cards in other user's turn",
 				status: 1001,
 			});
 		}
+
+		let query = 'SELECT * FROM game_users WHERE game_id = $1 AND user_id = $2;';
+		const fetchedPlayer = await db.oneOrNone(query, [gameId, userId]);
+
+		if (!fetchedPlayer.isCardPlayed) {
+			console.log('user already drew a card');
+			return res.status(200).json({
+				message: 'Cannot not draw more cards',
+				status: 1001,
+			});
+		}
+
 		const { cardToAssgin, reshuffle } = await cardDao.drawCards(
 			gameId,
 			userId,
@@ -494,23 +513,15 @@ router.post('/:id/draw', authUser, async (req, res, next) => {
 		const assignedCard = cardToAssgin[0];
 		console.log('Card info: ', assignedCard);
 
-		let updatedPlayerTurn =
-			(fetchedGame.clockwise
-				? fetchedGame.player_turn - 1
-				: fetchedGame.player_turn + 1) % fetchedGame.userCount;
-		updatedPlayerTurn =
-			updatedPlayerTurn < 0 ? fetchedGame.userCount - 1 : updatedPlayerTurn;
-		console.log('updated player turn: ', updatedPlayerTurn);
-
-		let query = 'UPDATE games\
-			SET player_turn = $1\
-			WHERE id = $2;';
-		await db.any(query, [updatedPlayerTurn, gameId]);
+		query =
+			'UPDATE game_users\
+				SET "isCardPlayed" = false WHERE game_id = $1 AND user_id = $2;';
+		await db.any(query, [gameId, userId]);
 
 		res.status(201).json({
 			message: 'card is drew',
 			card: assignedCard,
-			nextPlayerId: userIdList[updatedPlayerTurn].user_id,
+			// nextPlayerId: userIdList[updatedPlayerTurn].user_id,
 			drewBy: userId,
 			userIdList: userIdList,
 		});
@@ -584,5 +595,47 @@ router.post(
 		}
 	}
 );
+
+// End turn
+router.post('/:id/endTurn', authUser, async (req, res, next) => {
+	try {
+		const gameId = req.params.id;
+		const userId = req.session.userId;
+
+		const { isUserTurn, fetchedGame, userIdList } = await gameDao.checkUserTurn(
+			gameId,
+			userId
+		);
+		console.log('isUserTurn: ', isUserTurn);
+		if (!isUserTurn) {
+			return res.status(200).json({
+				message: "Cannot not end your turn in other user's turn",
+				status: 1001,
+			});
+		}
+
+		let updatedPlayerTurn =
+			(fetchedGame.clockwise
+				? fetchedGame.player_turn - 1
+				: fetchedGame.player_turn + 1) % fetchedGame.userCount;
+		updatedPlayerTurn =
+			updatedPlayerTurn < 0 ? fetchedGame.userCount - 1 : updatedPlayerTurn;
+		console.log('updated player turn: ', updatedPlayerTurn);
+
+		gameDao.updatePlayerTurn(updatedPlayerTurn, gameId);
+
+		let query =
+			'UPDATE game_users\
+			SET "isCardPlayed" = true WHERE game_id = $1 AND user_id = $2;';
+		await db.any(query, [gameId, userId]);
+
+		res.status(201).json({
+			message: 'end turn',
+			nextPlayerId: userIdList[updatedPlayerTurn].user_id,
+		});
+	} catch (err) {
+		next(err);
+	}
+});
 
 module.exports = router;

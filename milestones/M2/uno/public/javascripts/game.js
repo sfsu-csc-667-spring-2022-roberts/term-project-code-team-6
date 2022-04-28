@@ -12,6 +12,7 @@ if (gameId) socket.emit('join room', { gameId: gameId });
 const gameRoomDiv = document.getElementById('game-room');
 const userCount = document.getElementById('user-count');
 const discardedDiv = document.getElementById('discarded-cards');
+const endTurnSpan = document.getElementById('end-turn');
 
 const playerCards = document.getElementsByClassName('hand');
 const p1 = document.getElementById('p1');
@@ -68,8 +69,56 @@ function createYourTurn() {
 	const yourTurnElm = document.createElement('h1');
 	yourTurnElm.innerText = 'Your turn';
 	yourTurnElm.id = 'your-turn';
-	yourTurnElm.className = 'your-turn';
 	gameRoomDiv.appendChild(yourTurnElm);
+}
+
+function removeEndTurn() {
+	const endTurn = document.getElementById('end-turn');
+	if (endTurn) endTurn.remove();
+}
+
+async function onEndTurn() {
+	const result = await fetch(`/game/${gameId}/endTurn`, { method: 'POST' });
+	const body = await result.json();
+	console.log(body);
+
+	removeEndTurn();
+
+	removeYourTurn();
+
+	socket.emit('turn change', {
+		gameId: gameId,
+		nextPlayerId: body.nextPlayerId,
+	});
+}
+
+function createEndTurn() {
+	const endTurnElm = document.createElement('span');
+	endTurnElm.innerText = 'End Turn';
+	endTurnElm.id = 'end-turn';
+	endTurnElm.addEventListener('click', onEndTurn);
+	gameRoomDiv.appendChild(endTurnElm);
+}
+
+function createYourWin(name) {
+	const displayDiv = document.createElement('div');
+	displayDiv.id = 'display-winner';
+
+	const dummyDiv = document.createElement('div');
+
+	const youWin = document.createElement('p');
+	youWin.innerText = name + ' win';
+
+	const playAgain = document.createElement('p');
+	playAgain.innerText = 'Play Again';
+	playAgain.id = 'play-again';
+	playAgain.addEventListener('click', () => window.location.reload());
+
+	dummyDiv.appendChild(youWin);
+	dummyDiv.appendChild(playAgain);
+	displayDiv.appendChild(dummyDiv);
+
+	gameRoomDiv.appendChild(displayDiv);
 }
 
 async function onUpdateColor(body, color, popUpDiv) {
@@ -167,9 +216,12 @@ async function onPlayCard(cardId) {
 
 	if (!body.yourTurn) removeYourTurn();
 
+	removeEndTurn();
+
 	if (body.youWin) {
-		// To do - add ui
 		console.log('You win');
+		removeYourTurn();
+		createYourWin('You');
 		stopTheGame();
 	}
 
@@ -307,7 +359,8 @@ async function onDrawCard() {
 
 	addCardToHand([body.card]);
 
-	removeYourTurn();
+	// removeYourTurn();
+	createEndTurn();
 
 	updateBoard();
 
@@ -333,23 +386,6 @@ function stopTheGame() {
 
 function updateRingColor(color) {
 	console.log('color is: ', color);
-	// let rgb = '';
-	// switch (color) {
-	// 	case 'red':
-	// 		rgb = '#ed1c24';
-	// 		break;
-	// 	case 'blue':
-	// 		rgb = '#0072bc';
-	// 		break;
-	// 	case 'green':
-	// 		rgb = '#50aa44';
-	// 		break;
-	// 	case 'yellow':
-	// 		rgb = '#ffde16';
-	// 		break;
-	// 	default:
-	// 		rgb = '#fff';
-	// }
 	discardedDiv.className = `discarded-cards discarded-cards__${color}`;
 }
 
@@ -380,6 +416,11 @@ if (userCards && gameId) {
 		let cardId = card.id;
 		card.addEventListener('click', () => onPlayCard(cardId));
 	}
+}
+
+if (endTurnSpan) {
+	console.log(endTurnSpan);
+	endTurnSpan.addEventListener('click', onEndTurn);
 }
 
 socket.on('join game', data => {
@@ -416,9 +457,9 @@ socket.on('draw card', async data => {
 	const body = await result.json();
 	console.log(body);
 
-	if (data.nextPlayerId === body.uid) {
-		createYourTurn();
-	}
+	// if (data.nextPlayerId === body.uid) {
+	// 	createYourTurn();
+	// }
 
 	console.log(data.userIdList);
 
@@ -466,7 +507,6 @@ socket.on('play card', async data => {
 	const result = await fetch('/userInfo');
 	const body = await result.json();
 	console.log(body);
-
 
 	data.selectedColor
 		? updateRingColor(data.selectedColor)
@@ -567,12 +607,21 @@ socket.on('play card', async data => {
 
 	if (data.winner) {
 		console.log(data.winner + ' is the winner');
+		createYourWin(data.winner);
 
 		//remove card listeners from user
 		stopTheGame();
 	}
 });
 
-// socket.on win => remove card listener so user can not play cards
+socket.on('turn change', async data => {
+	console.log(data);
+	const result = await fetch('/userInfo');
+	const body = await result.json();
+	console.log(body);
+	if (data.nextPlayerId === body.uid) {
+		createYourTurn();
+	}
+});
 
 updateBoard();

@@ -23,6 +23,12 @@ io.on('connection', function (socket) {
 			socket.broadcast.to('room' + data.gameId).emit('play card', data);
 	});
 
+	socket.on('turn change', data => {
+		if (data.gameId)
+			socket.broadcast.to('room' + data.gameId).emit('turn change', data);
+	});
+
+
 	socket.on('chat message', data => {
 		console.log('socket chat message: ', data);
 		socket.broadcast.to(data.destination).emit('chat message', data);
