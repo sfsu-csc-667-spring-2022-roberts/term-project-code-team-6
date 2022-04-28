@@ -295,7 +295,7 @@ async function onPlayCard(cardId) {
 
 	updateBoard();
 
-	if (!body.wildFlag) {
+	if (!body.wildFlag || body.youWin) {
 		updateRingColor(body.color);
 		socket.emit('play card', {
 			id: body.cardId,
