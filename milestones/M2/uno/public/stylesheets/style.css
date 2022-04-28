@@ -204,7 +204,7 @@ a {
 	gap: 1rem;
 	background-color: white;
 	height: 25%;
-	border: 2px solid black;
+	border-bottom: 1px solid gray;
 	box-sizing: border-box;
 	align-items: center;
 	padding: 0 1rem;
