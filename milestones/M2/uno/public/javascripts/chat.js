@@ -18,11 +18,11 @@ function createChatDiv(username, message) {
 if (form) {
 	form.addEventListener('submit', async function (e) {
 		e.preventDefault();
-		console.log(input.value);
+		// console.log(input.value);
 		if (input.value) {
 			const result = await fetch('/userInfo');
 			const body = await result.json();
-			console.log(body);
+			// console.log(body);
 			const destination = gameId ? 'room' + gameId : 'lobby';
 			socket.emit('chat message', {
 				destination: destination,
@@ -38,8 +38,8 @@ if (form) {
 }
 
 socket.on('chat message', data => {
-	console.log('on chat message');
-	console.log(data);
+	// console.log('on chat message');
+	// console.log(data);
 	if (data.destination !== 'lobby' || !gameId) {
 		createChatDiv(data.username, data.message);
 		messages.scrollTop = messages.scrollHeight;

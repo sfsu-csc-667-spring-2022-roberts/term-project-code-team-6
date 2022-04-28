@@ -80,7 +80,7 @@ function removeEndTurn() {
 async function onEndTurn() {
 	const result = await fetch(`/game/${gameId}/endTurn`, { method: 'POST' });
 	const body = await result.json();
-	console.log(body);
+	// console.log(body);
 
 	removeEndTurn();
 
@@ -122,7 +122,7 @@ function createYourWin(name) {
 }
 
 async function onUpdateColor(body, color, popUpDiv) {
-	console.log(color, ' is clicked');
+	// console.log(color, ' is clicked');
 	const result = await fetch(
 		`/game/${gameId}/wild/${body.wildFlag}/color/` + color,
 		{
@@ -130,7 +130,7 @@ async function onUpdateColor(body, color, popUpDiv) {
 		}
 	);
 	const msg = await result.json();
-	console.log(msg);
+	// console.log(msg);
 	if (!msg.yourTurn) removeYourTurn();
 
 	updateRingColor(color);
@@ -157,10 +157,10 @@ async function onPlayCard(cardId) {
 		method: 'POST',
 	});
 	const body = await result.json();
-	console.log(body);
+	// console.log(body);
 
 	if (body.status && body.status == 1001) {
-		console.log(body.message);
+		// console.log(body.message);
 		return;
 	}
 
@@ -171,13 +171,13 @@ async function onPlayCard(cardId) {
 		const userIndex = body.userIdList.findIndex(
 			uid => uid.user_id === body.userId
 		);
-		console.log('user index is: ', userIndex);
+		// console.log('user index is: ', userIndex);
 
 		const neighborIndex = body.userIdList.findIndex(
 			uid => uid.user_id === body.neighbor.id
 		);
 
-		console.log('neighborIndex index: ', neighborIndex);
+		// console.log('neighborIndex index: ', neighborIndex);
 
 		addBackCards(
 			body.neighbor.drawCount,
@@ -219,22 +219,13 @@ async function onPlayCard(cardId) {
 	removeEndTurn();
 
 	if (body.youWin) {
-		console.log('You win');
+		// console.log('You win');
 		removeYourTurn();
 		createYourWin('You');
 		stopTheGame();
 	}
 
 	if (!body.youWin && body.wildFlag) {
-		console.log('Get user color input');
-		// const result = await fetch(
-		// 	`/game/${gameId}/wild/${body.wildFlag}/color/` + 'red',
-		// 	{
-		// 		method: 'POST',
-		// 	}
-		// );
-		// const msg = await result.json();
-
 		const colorPopup = document.createElement('div');
 		colorPopup.className = 'color-popup';
 
@@ -272,25 +263,6 @@ async function onPlayCard(cardId) {
 
 		colorPopup.append(colorPicker);
 		gameRoomDiv.append(colorPopup);
-
-		// const msg = await onUpdateColor(body, 'blue');
-		// console.log(msg);
-
-		// if (!msg.yourTurn) removeYourTurn();
-
-		// body.nextPlayerId = msg.nextPlayerId;
-		// socket.emit('play card', {
-		// 	id: body.cardId,
-		// 	gameId: gameId,
-		// 	color: body.color,
-		// 	value: body.value,
-		// 	rotate: body.rotate,
-		// 	nextPlayerId: body.nextPlayerId,
-		// 	playedBy: body.playedBy,
-		// 	userIdList: body.userIdList,
-		// 	winner: body.youWin ? body.username : null,
-		// 	neighbor: body.neighbor,
-		// });
 	}
 
 	updateBoard();
@@ -350,10 +322,10 @@ async function onDrawCard() {
 		method: 'POST',
 	});
 	const body = await result.json();
-	console.log(body);
+	// console.log(body);
 
 	if (body.status && body.status == 1001) {
-		console.log(body.message);
+		// console.log(body.message);
 		return;
 	}
 
@@ -374,7 +346,7 @@ async function onDrawCard() {
 
 function stopTheGame() {
 	if (userCards) {
-		console.log('remove user hand');
+		// console.log('remove user hand');
 		const newUserCards = userCards.cloneNode(true);
 		userCards.parentNode.replaceChild(newUserCards, userCards);
 	}
@@ -385,7 +357,7 @@ function stopTheGame() {
 }
 
 function updateRingColor(color) {
-	console.log('color is: ', color);
+	// console.log('color is: ', color);
 	discardedDiv.className = `discarded-cards discarded-cards__${color}`;
 }
 
@@ -419,12 +391,12 @@ if (userCards && gameId) {
 }
 
 if (endTurnSpan) {
-	console.log(endTurnSpan);
+	// console.log(endTurnSpan);
 	endTurnSpan.addEventListener('click', onEndTurn);
 }
 
 socket.on('join game', data => {
-	console.log(data);
+	// console.log(data);
 	if (data.gameId && data.gameId == gameId) {
 		const newLobbyUser = document.createElement('div');
 		const uid = document.createElement('p');
@@ -451,62 +423,40 @@ socket.on('start game', data => {
 });
 
 socket.on('draw card', async data => {
-	console.log(data);
+	// console.log(data);
 
 	const result = await fetch('/userInfo');
 	const body = await result.json();
-	console.log(body);
+	// console.log(body);
 
 	// if (data.nextPlayerId === body.uid) {
 	// 	createYourTurn();
 	// }
 
-	console.log(data.userIdList);
+	// console.log(data.userIdList);
 
 	const userIndex = data.userIdList.findIndex(uid => uid.user_id === body.uid);
-	console.log('user index is: ', userIndex);
+	// console.log('user index is: ', userIndex);
 
 	const previousPlayerIndex = data.userIdList.findIndex(
 		uid => uid.user_id === data.drewBy
 	);
 
-	console.log('previous player index: ', previousPlayerIndex);
+	// console.log('previous player index: ', previousPlayerIndex);
 
 	addBackCards(1, previousPlayerIndex, userIndex, data.userIdList.length);
-
-	// const backcard = document.createElement('div');
-	// backcard.className = 'card backcard';
-
-	// if (data.userIdList.length == 2) {
-	// 	p1.appendChild(backcard);
-	// } else if (data.userIdList.length == 3) {
-	// 	(userIndex + 1) % data.userIdList.length === previousPlayerIndex
-	// 		? p1.appendChild(backcard)
-	// 		: p2.appendChild(backcard);
-	// } else {
-	// 	if ((userIndex + 1) % data.userIdList.length === previousPlayerIndex) {
-	// 		p3.appendChild(backcard);
-	// 	} else if (
-	// 		(userIndex + 2) % data.userIdList.length ===
-	// 		previousPlayerIndex
-	// 	) {
-	// 		p1.appendChild(backcard);
-	// 	} else {
-	// 		p2.appendChild(backcard);
-	// 	}
-	// }
 
 	updateBoard();
 });
 
 socket.on('play card', async data => {
-	console.log(data);
+	// console.log(data);
 	const className = `card ${data.color}-${data.value}`;
 	createNewDiscardedCard(className, data.id, data.rotate);
 
 	const result = await fetch('/userInfo');
 	const body = await result.json();
-	console.log(body);
+	// console.log(body);
 
 	data.selectedColor
 		? updateRingColor(data.selectedColor)
@@ -515,19 +465,19 @@ socket.on('play card', async data => {
 	if (!data.winner && data.nextPlayerId === body.uid) {
 		createYourTurn();
 	}
-	console.log(data.userIdList);
+	// console.log(data.userIdList);
 
 	if (data.playedBy !== body.uid) {
 		const userIndex = data.userIdList.findIndex(
 			uid => uid.user_id === body.uid
 		);
-		console.log('user index is: ', userIndex);
+		// console.log('user index is: ', userIndex);
 
 		const previousPlayerIndex = data.userIdList.findIndex(
 			uid => uid.user_id === data.playedBy
 		);
 
-		console.log('previous player index: ', previousPlayerIndex);
+		// console.log('previous player index: ', previousPlayerIndex);
 
 		// remove card from users's hand
 		if (data.userIdList.length == 2) {
@@ -552,22 +502,22 @@ socket.on('play card', async data => {
 		// add cards to user if draw2 and draw4 were played
 		if (data.neighbor.drawCount) {
 			if (data.neighbor.id === body.uid) {
-				console.log('update user hand');
+				// console.log('update user hand');
 
 				addCardToHand(data.neighbor.drawCards);
 			} else {
-				console.log('update backcards');
+				// console.log('update backcards');
 
 				const userIndex = data.userIdList.findIndex(
 					uid => uid.user_id === body.uid
 				);
-				console.log('user index is: ', userIndex);
+				// console.log('user index is: ', userIndex);
 
 				const neighborIndex = data.userIdList.findIndex(
 					uid => uid.user_id === data.neighbor.id
 				);
 
-				console.log('neighbor index: ', neighborIndex);
+				// console.log('neighbor index: ', neighborIndex);
 
 				addBackCards(
 					data.neighbor.drawCount,
@@ -575,30 +525,6 @@ socket.on('play card', async data => {
 					userIndex,
 					data.userIdList.length
 				);
-
-				// for (let i = 0; i < data.neighbor.drawCount; i++) {
-				// 	const backcard = document.createElement('div');
-				// 	backcard.className = 'card backcard';
-
-				// 	if (data.userIdList.length == 2) {
-				// 		p1.appendChild(backcard);
-				// 	} else if (data.userIdList.length == 3) {
-				// 		(userIndex + 1) % data.userIdList.length === neighborIndex
-				// 			? p1.appendChild(backcard)
-				// 			: p2.appendChild(backcard);
-				// 	} else {
-				// 		if ((userIndex + 1) % data.userIdList.length === neighborIndex) {
-				// 			p3.appendChild(backcard);
-				// 		} else if (
-				// 			(userIndex + 2) % data.userIdList.length ===
-				// 			neighborIndex
-				// 		) {
-				// 			p1.appendChild(backcard);
-				// 		} else {
-				// 			p2.appendChild(backcard);
-				// 		}
-				// 	}
-				// }
 			}
 		}
 	}
@@ -606,7 +532,7 @@ socket.on('play card', async data => {
 	updateBoard();
 
 	if (data.winner) {
-		console.log(data.winner + ' is the winner');
+		// console.log(data.winner + ' is the winner');
 		createYourWin(data.winner);
 
 		//remove card listeners from user
@@ -615,10 +541,10 @@ socket.on('play card', async data => {
 });
 
 socket.on('turn change', async data => {
-	console.log(data);
+	// console.log(data);
 	const result = await fetch('/userInfo');
 	const body = await result.json();
-	console.log(body);
+	// console.log(body);
 	if (data.nextPlayerId === body.uid) {
 		createYourTurn();
 	}

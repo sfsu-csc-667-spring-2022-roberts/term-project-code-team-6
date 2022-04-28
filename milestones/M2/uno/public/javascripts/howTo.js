@@ -1,12 +1,9 @@
 // modal
-var modal = document.getElementById('htModal');
+const modal = document.getElementById('htModal');
 // button that opens modal (text on nav that says "how to play")
-var btn = document.getElementById('htp-btn');
+const btn = document.getElementById('htp-btn');
 // span element that closes modal
-var span = document.getElementById('close');
-console.log(span)
-
-console.log(modal)
+const span = document.getElementById('close');
 
 if (btn) {
 	btn.addEventListener('click', async () => {

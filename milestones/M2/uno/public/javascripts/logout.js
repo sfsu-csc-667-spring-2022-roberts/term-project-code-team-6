@@ -4,8 +4,8 @@ if (logout) {
 		const result = await fetch('/auth/logout', {
 			method: 'POST',
 		});
-		const body = await result.json();
-		console.log(body);
+		await result.json();
+		// console.log(body);
 		location.replace('/');
 	});
 }
