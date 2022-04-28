@@ -146,13 +146,28 @@ a {
 .chat-msg {
 	flex: 1;
 	padding: 1rem;
-	overflow: hidden;
-	overflow-y: scroll;
-	text-overflow: 'wrap';
+	overflow-y: auto;
+	overflow-wrap: break-word;
 }
 
 .chat-container {
 	margin-bottom: 1rem;
+}
+
+#chat-box {
+	display: flex;
+	flex-direction: column;
+	padding: 0.5rem;
+}
+
+#chat-box button {
+	display: block;
+	width: fit-content;
+	align-self: flex-end;
+	padding: 5px 15px;
+	margin-top: 0.5rem;
+	background-color: var(--secondary-color);
+	color: #fff;
 }
 
 .chat-input {
@@ -165,6 +180,10 @@ a {
 	border: none;
 	border-top: 1px solid black;
 	resize: none;
+}
+
+#chat-input {
+	height: 30px;
 }
 
 /* Game */

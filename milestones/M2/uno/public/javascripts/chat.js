@@ -6,7 +6,7 @@ const input = document.getElementById('chat-input');
 function createChatDiv(username, message) {
 	const chatDiv = document.createElement('div');
 	const chatUsername = document.createElement('span');
-	const chatMsg = document.createElement('p');
+	const chatMsg = document.createElement('span');
 	chatUsername.innerText = username + ': ';
 	chatMsg.innerText = message;
 	chatDiv.appendChild(chatUsername);
@@ -31,7 +31,7 @@ if (form) {
 			});
 
 			createChatDiv(body.username, input.value);
-
+			messages.scrollTop = messages.scrollHeight;
 			input.value = '';
 		}
 	});
@@ -40,6 +40,8 @@ if (form) {
 socket.on('chat message', data => {
 	console.log('on chat message');
 	console.log(data);
-	if (data.destination !== 'lobby' || !gameId)
+	if (data.destination !== 'lobby' || !gameId) {
 		createChatDiv(data.username, data.message);
+		messages.scrollTop = messages.scrollHeight;
+	}
 });
