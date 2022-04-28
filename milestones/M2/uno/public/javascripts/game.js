@@ -397,28 +397,25 @@ if (endTurnSpan) {
 
 socket.on('join game', data => {
 	// console.log(data);
-	if (data.gameId && data.gameId == gameId) {
-		const newLobbyUser = document.createElement('div');
-		const uid = document.createElement('p');
-		const username = document.createElement('p');
-		// const ready = document.createElement('p');
-		uid.innerText = `uid: ${data.uid}`;
-		username.innerText = `username: ${data.username}`;
-		// ready.innerText = 'false';
-		newLobbyUser.appendChild(uid);
-		newLobbyUser.appendChild(username);
-		// newLobbyUser.appendChild(ready);
-		newLobbyUser.className = 'game-lobby_user';
-		userCount.innerText = `${data.userCount} playing`;
+	console.log('join the game')
+	const newLobbyUser = document.createElement('div');
+	const uid = document.createElement('p');
+	const username = document.createElement('p');
+	// const ready = document.createElement('p');
+	uid.innerText = `uid: ${data.uid}`;
+	username.innerText = `username: ${data.username}`;
+	// ready.innerText = 'false';
+	newLobbyUser.appendChild(uid);
+	newLobbyUser.appendChild(username);
+	// newLobbyUser.appendChild(ready);
+	newLobbyUser.className = 'game-lobby_user';
+	userCount.innerText = `${data.userCount} playing`;
 
-		gameRoomDiv.appendChild(newLobbyUser);
-	}
+	gameRoomDiv.appendChild(newLobbyUser);
 });
 
 // eslint-disable-next-line no-unused-vars
 socket.on('start game', data => {
-	// Don't know why if reload is trigged at the same time
-	// users all get the same cards
 	setTimeout(() => window.location.reload(), Math.floor(Math.random() * 1000));
 });
 

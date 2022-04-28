@@ -192,10 +192,7 @@ router.get('/:id', authUser, async (req, res, next) => {
 				query = 'SELECT username FROM users WHERE id = $1;';
 				const { username } = await db.one(query, [userId]);
 
-				// console.log("sockets is: ", socketApi.io.sockets.broadcast)
-
-				socketApi.io.emit('join game', {
-					gameId: gameId,
+				socketApi.io.to('room' + gameId).emit('join game', {
 					uid: userId,
 					username: username,
 					userCount: updatedUserCount,
@@ -280,7 +277,9 @@ router.post('/:id/start', authUser, async (req, res, next) => {
 			end = end + INITIAL_CARD_COUNT;
 		}
 
-		socketApi.io.emit('start game', { message: 'Game started' });
+		socketApi.io
+			.to('room' + gameId)
+			.emit('start game', { message: 'Game started' });
 	} catch (err) {
 		next(err);
 	}
@@ -369,7 +368,7 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		query =
 			'UPDATE game_users\
 			SET "isCardPlayed" = true WHERE game_id = $1 AND user_id = $2;';
-			await db.any(query, [gameId, userId]);
+		await db.any(query, [gameId, userId]);
 
 		let updatedPlayerTurn = fetchedGame.player_turn;
 		let neighbor = {};
