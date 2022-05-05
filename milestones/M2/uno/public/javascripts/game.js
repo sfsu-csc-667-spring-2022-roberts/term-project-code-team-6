@@ -79,17 +79,17 @@ function removeEndTurn() {
 
 async function onEndTurn() {
 	const result = await fetch(`/game/${gameId}/endTurn`, { method: 'POST' });
-	const body = await result.json();
+	await result.json();
 	// console.log(body);
 
 	removeEndTurn();
 
 	removeYourTurn();
 
-	socket.emit('turn change', {
-		gameId: gameId,
-		nextPlayerId: body.nextPlayerId,
-	});
+	// socket.emit('turn change', {
+	// 	gameId: gameId,
+	// 	nextPlayerId: body.nextPlayerId,
+	// });
 }
 
 function createEndTurn() {
@@ -405,7 +405,6 @@ socket.on('draw card', async data => {
 	if (data.drewBy === body.uid) {
 		addCardToHand([data.card]);
 		createEndTurn();
-
 	} else {
 		const userIndex = data.userIdList.findIndex(
 			uid => uid.user_id === body.uid

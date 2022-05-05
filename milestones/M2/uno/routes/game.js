@@ -428,8 +428,8 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		} else {
 			query =
 				'UPDATE games\
-							SET "discardedCount" = $1, player_turn = $2, curr_color = $3, curr_value = $4, clockwise = $5\
-							WHERE id = $6;';
+				SET "discardedCount" = $1, player_turn = $2, curr_color = $3, curr_value = $4, clockwise = $5\
+				WHERE id = $6;';
 			await db.any(query, [
 				fetchedGame.discardedCount + 1,
 				updatedPlayerTurn,
@@ -517,14 +517,12 @@ router.post('/:id/draw', authUser, async (req, res, next) => {
 				SET "isCardPlayed" = false WHERE game_id = $1 AND user_id = $2;';
 		await db.any(query, [gameId, userId]);
 
-		socketApi.io
-			.to('room' + gameId)
-			.emit('draw card', {
-				gameId: gameId,
-				card: assignedCard,
-				drewBy: userId,
-				userIdList: userIdList,
-			});
+		socketApi.io.to('room' + gameId).emit('draw card', {
+			gameId: gameId,
+			card: assignedCard,
+			drewBy: userId,
+			userIdList: userIdList,
+		});
 
 		res.status(201).json({
 			message: 'card is drew',
@@ -636,9 +634,15 @@ router.post('/:id/endTurn', authUser, async (req, res, next) => {
 			SET "isCardPlayed" = true WHERE game_id = $1 AND user_id = $2;';
 		await db.any(query, [gameId, userId]);
 
+		socketApi.io
+			.to('room' + gameId)
+			.emit('turn change', {
+				nextPlayerId: userIdList[updatedPlayerTurn].user_id,
+			});
+
 		res.status(201).json({
 			message: 'end turn',
-			nextPlayerId: userIdList[updatedPlayerTurn].user_id,
+			// nextPlayerId: userIdList[updatedPlayerTurn].user_id,
 		});
 	} catch (err) {
 		next(err);

@@ -14,20 +14,20 @@ io.on('connection', function (socket) {
 		console.log('user disconnected');
 	});
 
-	socket.on('draw card', data => {
-		if (data.gameId)
-			socket.broadcast.to('room' + data.gameId).emit('draw card', data);
-	});
+	// socket.on('draw card', data => {
+	// 	if (data.gameId)
+	// 		socket.broadcast.to('room' + data.gameId).emit('draw card', data);
+	// });
 
 	socket.on('play card', data => {
 		if (data.gameId)
 			socket.broadcast.to('room' + data.gameId).emit('play card', data);
 	});
 
-	socket.on('turn change', data => {
-		if (data.gameId)
-			socket.broadcast.to('room' + data.gameId).emit('turn change', data);
-	});
+	// socket.on('turn change', data => {
+	// 	if (data.gameId)
+	// 		socket.broadcast.to('room' + data.gameId).emit('turn change', data);
+	// });
 
 
 	socket.on('chat message', data => {
