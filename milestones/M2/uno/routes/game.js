@@ -517,12 +517,20 @@ router.post('/:id/draw', authUser, async (req, res, next) => {
 				SET "isCardPlayed" = false WHERE game_id = $1 AND user_id = $2;';
 		await db.any(query, [gameId, userId]);
 
+		socketApi.io
+			.to('room' + gameId)
+			.emit('draw card', {
+				gameId: gameId,
+				card: assignedCard,
+				drewBy: userId,
+				userIdList: userIdList,
+			});
+
 		res.status(201).json({
 			message: 'card is drew',
-			card: assignedCard,
-			// nextPlayerId: userIdList[updatedPlayerTurn].user_id,
-			drewBy: userId,
-			userIdList: userIdList,
+			// card: assignedCard,
+			// drewBy: userId,
+			// userIdList: userIdList,
 		});
 	} catch (err) {
 		next(err);

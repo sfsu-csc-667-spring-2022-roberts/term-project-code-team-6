@@ -185,31 +185,6 @@ async function onPlayCard(cardId) {
 			userIndex,
 			body.userIdList.length
 		);
-
-		// const p1 = document.getElementById('p1');
-		// const p2 = document.getElementById('p2');
-		// const p3 = document.getElementById('p3');
-
-		// for (let i = 0; i < body.neighbor.drawCount; i++) {
-		// 	const backcard = document.createElement('div');
-		// 	backcard.className = 'card backcard';
-
-		// 	if (body.userIdList.length == 2) {
-		// 		p1.appendChild(backcard);
-		// 	} else if (body.userIdList.length == 3) {
-		// 		(userIndex + 1) % body.userIdList.length === neighborIndex
-		// 			? p1.appendChild(backcard)
-		// 			: p2.appendChild(backcard);
-		// 	} else {
-		// 		if ((userIndex + 1) % body.userIdList.length === neighborIndex) {
-		// 			p3.appendChild(backcard);
-		// 		} else if ((userIndex + 2) % body.userIdList.length === neighborIndex) {
-		// 			p1.appendChild(backcard);
-		// 		} else {
-		// 			p2.appendChild(backcard);
-		// 		}
-		// 	}
-		// }
 	}
 
 	card.remove();
@@ -329,19 +304,18 @@ async function onDrawCard() {
 		return;
 	}
 
-	addCardToHand([body.card]);
+	// addCardToHand([body.card]);
 
-	// removeYourTurn();
-	createEndTurn();
+	// createEndTurn();
 
-	updateBoard();
+	// updateBoard();
 
-	socket.emit('draw card', {
-		gameId: gameId,
-		nextPlayerId: body.nextPlayerId,
-		drewBy: body.drewBy,
-		userIdList: body.userIdList,
-	});
+	// socket.emit('draw card', {
+	// 	gameId: gameId,
+	// 	nextPlayerId: body.nextPlayerId,
+	// 	drewBy: body.drewBy,
+	// 	userIdList: body.userIdList,
+	// });
 }
 
 function stopTheGame() {
@@ -397,7 +371,7 @@ if (endTurnSpan) {
 
 socket.on('join game', data => {
 	// console.log(data);
-	console.log('join the game')
+	console.log('join the game');
 	const newLobbyUser = document.createElement('div');
 	const uid = document.createElement('p');
 	const username = document.createElement('p');
@@ -426,22 +400,26 @@ socket.on('draw card', async data => {
 	const body = await result.json();
 	// console.log(body);
 
-	// if (data.nextPlayerId === body.uid) {
-	// 	createYourTurn();
-	// }
-
 	// console.log(data.userIdList);
 
-	const userIndex = data.userIdList.findIndex(uid => uid.user_id === body.uid);
-	// console.log('user index is: ', userIndex);
+	if (data.drewBy === body.uid) {
+		addCardToHand([data.card]);
+		createEndTurn();
 
-	const previousPlayerIndex = data.userIdList.findIndex(
-		uid => uid.user_id === data.drewBy
-	);
+	} else {
+		const userIndex = data.userIdList.findIndex(
+			uid => uid.user_id === body.uid
+		);
+		// console.log('user index is: ', userIndex);
 
-	// console.log('previous player index: ', previousPlayerIndex);
+		const previousPlayerIndex = data.userIdList.findIndex(
+			uid => uid.user_id === data.drewBy
+		);
 
-	addBackCards(1, previousPlayerIndex, userIndex, data.userIdList.length);
+		// console.log('previous player index: ', previousPlayerIndex);
+
+		addBackCards(1, previousPlayerIndex, userIndex, data.userIdList.length);
+	}
 
 	updateBoard();
 });
@@ -531,7 +509,6 @@ socket.on('play card', async data => {
 	if (data.winner) {
 		// console.log(data.winner + ' is the winner');
 		createYourWin(data.winner);
-
 		//remove card listeners from user
 		stopTheGame();
 	}
