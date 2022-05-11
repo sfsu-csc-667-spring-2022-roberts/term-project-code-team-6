@@ -3,6 +3,7 @@ const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const db = require('../db');
+const { removeSocket } = require('../utils/socketMap');
 
 const SALT_ROUNDS = 12;
 
@@ -84,8 +85,8 @@ router.post(
 
 			res.locals.isAuth = true;
 
-			console.log("Session email: ", req.session.email )
-			console.log("Session userId: ", req.session.userId)
+			console.log('Session email: ', req.session.email);
+			console.log('Session userId: ', req.session.userId);
 			console.log('local isAuth', res.locals.isAuth);
 
 			res.redirect('/');
@@ -97,6 +98,7 @@ router.post(
 
 router.post('/logout', (req, res, next) => {
 	console.log('logging out');
+	const userId = req.session.userId;
 	req.session.destroy(err => {
 		if (err) {
 			console.log('Session could not be destroyed.');
@@ -104,6 +106,7 @@ router.post('/logout', (req, res, next) => {
 		} else {
 			console.log('Session was destroyed.');
 			res.clearCookie('unoSession');
+			removeSocket(userId);
 			res.json({ status: 'OK', message: 'user is logged out' });
 		}
 	});

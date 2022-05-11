@@ -11,6 +11,8 @@ function removeSocket(uid) {
 }
 
 function getUserSocket(uid) {
+	// console.log(Object.keys(socketMap));
+	// console.log('uid: ', uid, ' socket: ', socketMap[uid]);
 	return socketMap[uid];
 }
 

@@ -7,7 +7,7 @@ const pathArray = window.location.pathname.split('/');
 const gameId =
 	pathArray.length === 3 && pathArray[1] === 'game' ? pathArray[2] : null;
 
-if (gameId) socket.emit('join room', { gameId: gameId });
+// if (gameId) socket.emit('join room', { gameId: gameId });
 
 const gameRoomDiv = document.getElementById('game-room');
 const userCount = document.getElementById('user-count');

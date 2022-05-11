@@ -77,7 +77,7 @@ router.get('/:id', authUser, async (req, res, next) => {
 		const fetchedPlayer = await db.oneOrNone(query, [fetchedGame.id, userId]);
 
 		if (fetchedGame.active) {
-			// <<NOTE>> Not allow other user to watch an active game for now
+			// NOTE: Not allow other user to watch an active game for now
 			if (!fetchedPlayer) {
 				return res.redirect('/');
 			}
@@ -634,11 +634,9 @@ router.post('/:id/endTurn', authUser, async (req, res, next) => {
 			SET "isCardPlayed" = true WHERE game_id = $1 AND user_id = $2;';
 		await db.any(query, [gameId, userId]);
 
-		socketApi.io
-			.to('room' + gameId)
-			.emit('turn change', {
-				nextPlayerId: userIdList[updatedPlayerTurn].user_id,
-			});
+		socketApi.io.to('room' + gameId).emit('turn change', {
+			nextPlayerId: userIdList[updatedPlayerTurn].user_id,
+		});
 
 		res.status(201).json({
 			message: 'end turn',
