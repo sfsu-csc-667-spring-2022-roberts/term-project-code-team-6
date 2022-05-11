@@ -1,7 +1,7 @@
 <div class='landing-top'>
 	<div class="search-container">
 		<p>{{count}} games</p>
-		<form action='/search'><input type='text' name="keyword" /></form>
+		<form action='/search'><input type='text' placeholder="Search by game id" name="keyword" /></form>
 	</div>
 	<button id='create-game' class='secondary-btn'>Create New Game</button>
 </div>
@@ -19,5 +19,5 @@
 			</div>
 		{{/each}}
 	</div>
-	{{!-- {{> chat}} --}}
+	{{> chat}}
 </div>
