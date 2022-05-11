@@ -15,6 +15,11 @@ const setDiscardedCountQuery =
 	SET "discardedCount" = 0\
 	WHERE id = $1;';
 
+const searchGameQuery = `
+	SELECT id, "userCount" FROM games
+	WHERE CAST(id AS varchar) LIKE $1
+`;
+
 const updateUserCountQuery = 'UPDATE games SET "userCount" = $1 WHERE id = $2;';
 
 async function checkUserTurn(gameId, userId) {
@@ -78,6 +83,17 @@ async function updateUserCount(gameId, userCount) {
 	}
 }
 
+async function searchGame(keyword) {
+	try {
+		console.log(keyword);
+		const games = await db.any(searchGameQuery, ['%' + keyword + '%']);
+		console.log('game is:', games);
+		return games;
+	} catch (err) {
+		console.log(err);
+	}
+}
+
 module.exports = {
 	checkUserTurn,
 	updatePlayerTurn,
@@ -85,4 +101,5 @@ module.exports = {
 	getGameById,
 	setDiscardedCount,
 	updateUserCount,
+	searchGame,
 };

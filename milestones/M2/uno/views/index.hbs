@@ -1,9 +1,12 @@
 <div class='landing-top'>
-	<p>{{count}} games</p>
+	<div class="search-container">
+		<p>{{count}} games</p>
+		<form action='/search'><input type='text' name="keyword" /></form>
+	</div>
 	<button id='create-game' class='secondary-btn'>Create New Game</button>
 </div>
 <div class='landing'>
-	<div class='landing_game-room'>
+	<div id='game-list' class='landing_game-room'>
 		{{#each games}}
 			<div class='landing_list-item'>
 				<div class='landing_list-item_left'>
@@ -11,22 +14,10 @@
 					<p>players: {{userCount}}/4</p>
 				</div>
 				<div>
-					<a href="/game/{{id}}" class='secondary-btn'>Join</a>
+					<a href='/game/{{id}}' class='secondary-btn'>Join</a>
 				</div>
 			</div>
 		{{/each}}
 	</div>
-	{{> chat}}
+	{{!-- {{> chat}} --}}
 </div>
-<script>
-	const createGameBtn = document.getElementById('create-game');
-	if (createGameBtn) {
-		createGameBtn.addEventListener('click', async () => { 
-			const result = await fetch('/game/create', { method: 'POST', 
-			headers: { 'Accept':'application/json', 'Content-Type': 'application/json' }, 
-			body: JSON.stringify({title: "Default Game"})}); const body = await result.json();
-			console.log(body); 
-			location.assign("/game/" + body.gameId)
-		}); 
-	}
-</script>
