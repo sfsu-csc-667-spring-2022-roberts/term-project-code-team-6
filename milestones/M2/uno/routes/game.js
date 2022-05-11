@@ -4,8 +4,11 @@ const authUser = require('../middleware/isAuth');
 const { body, validationResult } = require('express-validator');
 const db = require('../db');
 const socketApi = require('../sockets');
-const cardDao = require('../db/cardDao');
+// const cardDao = require('../db/cardDao');
 const gameDao = require('../db/gameDao');
+const gameUserDao = require('../db/gameUserDao');
+const gameCardDao = require('../db/gameCardDao');
+const userDao = require('../db/userDao');
 
 // Create Game
 router.post(
@@ -22,37 +25,11 @@ router.post(
 
 			const title = req.body.title;
 			const userId = req.session.userId;
-
-			console.log('uid is: ', userId);
-
-			let query = 'INSERT INTO games ("userCount") VALUES (1) RETURNING id';
-			const { id } = await db.one(query, []);
-			const gameId = id;
+			const gameId = await gameDao.createGame();
 			console.log('Created game id is: ', gameId);
 
-			query =
-				'INSERT INTO game_users (game_id, user_id, "isReady", player_order) VALUES ($1, $2, true, 1);';
-			await db.any(query, [gameId, userId]);
-
-			await cardDao.shuffleCards(gameId);
-
-			// let order = [];
-			// for (let i = 0; i < 108; i++) order.push(i + 1);
-
-			// for (let i = 0; i < 108; i++) {
-			// 	let rnd = Math.floor(Math.random() * 30);
-			// 	let temp = order[i];
-			// 	order[i] = order[rnd];
-			// 	order[rnd] = temp;
-			// }
-
-			// query = `INSERT INTO game_cards (game_id, card_id, "order") VALUES (${gameId}, ${1}, ${
-			// 	order[0]
-			// })`;
-			// for (let i = 1; i < 108; i++) {
-			// 	query += `, (${gameId}, ${i + 1}, ${order[i]})`;
-			// }
-			// await db.any(query, []);
+			await gameUserDao.addNewPlayer(gameId, userId, true, 1);
+			await gameCardDao.shuffleCards(gameId);
 
 			res.status(201).json({ title, userId, gameId });
 		} catch (err) {
@@ -67,14 +44,13 @@ router.get('/:id', authUser, async (req, res, next) => {
 		const gameId = req.params.id;
 		const userId = req.session.userId;
 
-		let query = 'SELECT * FROM games WHERE id = $1';
-		const fetchedGame = await db.oneOrNone(query, gameId);
+		// let query = 'SELECT * FROM games WHERE id = $1';
+		const fetchedGame = await gameDao.getGameById(gameId);
 		if (!fetchedGame) throw new Error('Game not found');
 		console.log('fetchedGame: ', fetchedGame);
 
 		// check if the user is already in the game
-		query = 'SELECT * FROM game_users WHERE game_id = $1 AND user_id = $2;';
-		const fetchedPlayer = await db.oneOrNone(query, [fetchedGame.id, userId]);
+		const fetchedPlayer = await gameUserDao.getPlayerById(gameId, userId);
 
 		if (fetchedGame.active) {
 			// NOTE: Not allow other user to watch an active game for now
@@ -82,85 +58,92 @@ router.get('/:id', authUser, async (req, res, next) => {
 				return res.redirect('/');
 			}
 
-			query =
-				'SELECT id, color, value FROM game_cards\
-				JOIN cards ON card_id = cards.id\
-				WHERE game_id = $1 AND user_id = $2\
-				ORDER BY "order"';
-			const userCards = await db.any(query, [gameId, userId]);
+			// query =
+			// 	'SELECT id, color, value FROM game_cards\
+			// 	JOIN cards ON card_id = cards.id\
+			// 	WHERE game_id = $1 AND user_id = $2\
+			// 	ORDER BY "order"';
+			// const userCards = await db.any(query, [gameId, userId]);
+			const userCards = await gameCardDao.getUserCards(gameId, userId);
 			console.log(userCards);
 
-			query =
-				'SELECT user_id\
-				FROM game_users\
-				WHERE game_id = $1\
-				ORDER BY player_order;';
-			const userIdList = await db.any(query, [gameId]);
+			// query =
+			// 	'SELECT user_id\
+			// 	FROM game_users\
+			// 	WHERE game_id = $1\
+			// 	ORDER BY player_order;';
+			// const userIdList = await db.any(query, [gameId]);
+			const userIdList = await gameUserDao.getUserIdList(gameId);
 			console.log(userIdList);
 
 			const userIndex = userIdList.findIndex(uid => uid.user_id === userId);
 			console.log('user index is at: ', userIndex);
 
 			// <<NOTE>> need update the query if we add observer
-			query =
-				'SELECT COUNT(*)\
-				FROM game_cards\
-				WHERE game_id = $1 AND user_id = $2;';
+
+			// query =
+			// 	'SELECT COUNT(*)\
+			// 	FROM game_cards\
+			// 	WHERE game_id = $1 AND user_id = $2;';
 			let playerCards = {};
 			if (userIdList.length == 2) {
 				const p1Index = (userIndex + 1) % userIdList.length;
-				console.log('p1 index is at: ', p1Index);
+				// console.log('p1 index is at: ', p1Index);
 				const p1Id = userIdList[p1Index].user_id;
-				console.log('p1Id: ', p1Id);
-
-				const p1CardCountObj = await db.one(query, [gameId, p1Id]);
-				playerCards.p1 = new Array(+p1CardCountObj.count).fill(0);
+				// console.log('p1Id: ', p1Id);
+				// const p1CardCountObj = await db.one(query, [gameId, p1Id]);
+				const p1CardCount = await gameCardDao.getUserCardCount(gameId, p1Id);
+				playerCards.p1 = new Array(p1CardCount).fill(0);
 			} else if (userIdList.length == 3) {
 				const p1Index = (userIndex + 1) % userIdList.length;
-				console.log('p1 index is at: ', p1Index);
+				// console.log('p1 index is at: ', p1Index);
 				const p1Id = userIdList[p1Index].user_id;
-				console.log('p1Id: ', p1Id);
+				// console.log('p1Id: ', p1Id);
 
-				const p1CardCountObj = await db.one(query, [gameId, p1Id]);
-				console.log('p1Count: ', p1CardCountObj.count);
-				playerCards.p1 = new Array(+p1CardCountObj.count).fill(0);
+				// const p1CardCountObj = await db.one(query, [gameId, p1Id]);
+				// console.log('p1Count: ', p1CardCountObj.count);
+				const p1CardCount = await gameCardDao.getUserCardCount(gameId, p1Id);
+				playerCards.p1 = new Array(p1CardCount).fill(0);
 
 				const p2Index = (userIndex + 2) % userIdList.length;
 				console.log('p1 index is at: ', p2Index);
 				const p2Id = userIdList[p2Index].user_id;
 				console.log('p2Id: ', p2Id);
 
-				const p2CardCountObj = await db.one(query, [gameId, p2Id]);
-				console.log('p2Count: ', p2CardCountObj.count);
-				playerCards.p2 = new Array(+p2CardCountObj.count).fill(0);
+				// const p2CardCountObj = await db.one(query, [gameId, p2Id]);
+				const p2CardCount = await gameCardDao.getUserCardCount(gameId, p2Id);
+
+				// console.log('p2Count: ', p2CardCount);
+				playerCards.p2 = new Array(p2CardCount).fill(0);
 			} else {
 				const p1Index = (userIndex + 2) % userIdList.length;
 				const p1Id = userIdList[p1Index].user_id;
 
-				const p1CardCountObj = await db.one(query, [gameId, p1Id]);
-				playerCards.p1 = new Array(+p1CardCountObj.count).fill(0);
+				const p1CardCount = await gameCardDao.getUserCardCount(gameId, p1Id);
+				playerCards.p1 = new Array(p1CardCount).fill(0);
 
 				const p2Index = (userIndex + 3) % userIdList.length;
 				const p2Id = userIdList[p2Index].user_id;
 
-				const p2CardCountObj = await db.one(query, [gameId, p2Id]);
-				playerCards.p2 = new Array(+p2CardCountObj.count).fill(0);
+				const p2CardCount = await gameCardDao.getUserCardCount(gameId, p2Id);
+				playerCards.p2 = new Array(p2CardCount).fill(0);
 
 				const p3Index = (userIndex + 1) % userIdList.length;
 				const p3Id = userIdList[p3Index].user_id;
 
-				const p3CardCountObj = await db.one(query, [gameId, p3Id]);
-				playerCards.p3 = new Array(+p3CardCountObj.count).fill(0);
+				const p3CardCount = await gameCardDao.getUserCardCount(gameId, p3Id);
+				playerCards.p3 = new Array(p3CardCount).fill(0);
 			}
 
 			playerCards.user = userCards;
 
-			query =
-				'SELECT id, color, value, rotate FROM game_cards\
-				JOIN cards ON card_id = cards.id\
-				WHERE game_id = $1 AND discarded = true\
-				ORDER BY "order";';
-			const discardedCards = await db.manyOrNone(query, [gameId]);
+			// query =
+			// 	'SELECT id, color, value, rotate FROM game_cards\
+			// 	JOIN cards ON card_id = cards.id\
+			// 	WHERE game_id = $1 AND discarded = true\
+			// 	ORDER BY "order";';
+			// const discardedCards = await db.manyOrNone(query, [gameId]);
+			const discardedCards = await gameCardDao.getDiscardedCards(gameId);
 
 			res.render('game', {
 				playerCards: playerCards,
@@ -180,17 +163,26 @@ router.get('/:id', authUser, async (req, res, next) => {
 			else if (fetchedGame.userCount < 4) {
 				console.log('current user count', fetchedGame.userCount);
 				let updatedUserCount = ++fetchedGame.userCount;
-				query =
-					'INSERT INTO game_users(game_id, user_id, player_order) VALUES ($1, $2, $3);';
-				await db.any(query, [fetchedGame.id, userId, updatedUserCount]);
+				// let query =
+				// 	'INSERT INTO game_users(game_id, user_id, player_order) VALUES ($1, $2, $3);';
+				// await db.any(query, [fetchedGame.id, userId, updatedUserCount]);
+				await gameUserDao.addNewPlayer(
+					fetchedGame.id,
+					userId,
+					false,
+					updatedUserCount
+				);
 
 				// update game user count
-				query = 'UPDATE games SET "userCount" = $1 WHERE id = $2;';
-				await db.any(query, [updatedUserCount, fetchedGame.id]);
+				// query = 'UPDATE games SET "userCount" = $1 WHERE id = $2;';
+				// await db.any(query, [updatedUserCount, fetchedGame.id]);
+				await gameDao.updateUserCount(fetchedGame.id, updatedUserCount);
 
 				// get username
-				query = 'SELECT username FROM users WHERE id = $1;';
-				const { username } = await db.one(query, [userId]);
+				// query = 'SELECT username FROM users WHERE id = $1;';
+				// const { username } = await db.one(query, [userId]);
+
+				const { username } = await userDao.getUserInfo(userId);
 
 				socketApi.io.to('room' + gameId).emit('join game', {
 					uid: userId,
@@ -201,11 +193,12 @@ router.get('/:id', authUser, async (req, res, next) => {
 				console.log('observers');
 			}
 
-			query =
-				'SELECT id AS uid, username, "isReady" FROM game_users \
-					JOIN users ON user_id = users.id\
-					WHERE game_id = $1';
-			const players = await db.manyOrNone(query, fetchedGame.id);
+			// let query =
+			// 	'SELECT id AS uid, username, "isReady" FROM game_users \
+			// 		JOIN users ON user_id = users.id\
+			// 		WHERE game_id = $1';
+			// const players = await db.manyOrNone(query, fetchedGame.id);
+			const players = await gameUserDao.getAllPlayers(fetchedGame.id);
 			console.log('Players are: ', players);
 			console.log('Updated user count', fetchedGame.userCount);
 
@@ -398,7 +391,7 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 				`draw card type: ${hasDraw} and target player id: ${neighbor.id}`
 			);
 			neighbor.drawCount = hasDraw === 'draw4' ? 4 : 2;
-			const { cardToAssgin } = await cardDao.drawCards(
+			const { cardToAssgin } = await gameCardDao.drawCards(
 				gameId,
 				neighbor.id,
 				neighbor.drawCount
@@ -424,7 +417,7 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 				WHERE game_id = $1';
 			await db.any(query, [gameId]);
 
-			await cardDao.shuffleCards(gameId);
+			await gameCardDao.shuffleCards(gameId);
 		} else {
 			query =
 				'UPDATE games\
@@ -520,7 +513,7 @@ router.post('/:id/draw', authUser, async (req, res, next) => {
 			});
 		}
 
-		const { cardToAssgin, reshuffle } = await cardDao.drawCards(
+		const { cardToAssgin, reshuffle } = await gameCardDao.drawCards(
 			gameId,
 			userId,
 			drawCount
@@ -610,7 +603,7 @@ router.post(
 
 			socketApi.io.to('room' + gameId).emit('update color', {
 				color,
-				nextPlayerId: userIdList[updatedPlayerTurn].user_id
+				nextPlayerId: userIdList[updatedPlayerTurn].user_id,
 			});
 
 			res.status(201).json({

@@ -1,12 +1,17 @@
 const db = require('../db');
 
+const getSessionQuery =
+	'SELECT sess\
+    FROM public.session\
+    WHERE sid = $1';
+
 async function getSession(sid) {
-	let query =
-		'SELECT sess\
-	            FROM public.session\
-                WHERE sid = $1';
-	const {sess} = await db.one(query, [sid]);
-	return sess;
+	try {
+		const { sess } = await db.one(getSessionQuery, [sid]);
+		return sess;
+	} catch (err) {
+		console.log(err);
+	}
 }
 
 module.exports = {
