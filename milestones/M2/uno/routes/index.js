@@ -8,16 +8,9 @@ const isAuth = require('../middleware/isAuth');
 router.get('/', authUser, async function (req, res) {
 	let query = 'SELECT id, "userCount" FROM games;';
 	const games = await db.manyOrNone(query, []);
-	query = 'SELECT COUNT(id) FROM games;';
-	const { count } = await db.one(query, []);
 	console.log(games);
-	res.render('index', { title: 'UNO', games: games, count: count });
+	res.render('index', { title: 'UNO', games: games, count: games.length });
 });
-
-/* GET how to play page. */
-// router.get('/how-to-play', function (req, res) {
-// 	res.render('partials/how-to-play');
-// });
 
 router.get('/login', function (req, res) {
 	res.render('login');
