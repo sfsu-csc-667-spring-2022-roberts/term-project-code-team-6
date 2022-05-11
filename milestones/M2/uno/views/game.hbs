@@ -50,13 +50,13 @@
 				<span id='end-turn'>End turn</span>
 			{{/unless}}
 		{{else}}
-			{{#each players}}
-				<div class='game-lobby_user'>
-					<p>uid: {{uid}}</p>
-					<p>username: {{username}}</p>
-					{{!-- <p>ready: {{isReady}}</p> --}}
-				</div>
-			{{/each}}
+			<div id="game-lobby">
+				{{#each players}}
+					<div class='game-lobby_user'>
+						<p class='game-lobby_user-username'>{{username}}</p>
+					</div>
+				{{/each}}
+			</div>
 		{{/if}}
 	</div>
 	{{> chat}}

@@ -13,6 +13,7 @@ const gameRoomDiv = document.getElementById('game-room');
 const userCount = document.getElementById('user-count');
 const discardedDiv = document.getElementById('discarded-cards');
 const endTurnSpan = document.getElementById('end-turn');
+const gameLobby = document.getElementById('game-lobby');
 
 const playerCards = document.getElementsByClassName('hand');
 const p1 = document.getElementById('p1');
@@ -413,19 +414,20 @@ socket.on('join game', data => {
 	// console.log(data);
 	console.log('join the game');
 	const newLobbyUser = document.createElement('div');
-	const uid = document.createElement('p');
+	// const uid = document.createElement('p');
 	const username = document.createElement('p');
 	// const ready = document.createElement('p');
-	uid.innerText = `uid: ${data.uid}`;
-	username.innerText = `username: ${data.username}`;
+	// uid.innerText = `uid: ${data.uid}`;
+	username.innerText = `${data.username}`;
+	username.className = 'game-lobby_user-username';
 	// ready.innerText = 'false';
-	newLobbyUser.appendChild(uid);
+	// newLobbyUser.appendChild(uid);
 	newLobbyUser.appendChild(username);
 	// newLobbyUser.appendChild(ready);
 	newLobbyUser.className = 'game-lobby_user';
 	userCount.innerText = `${data.userCount} playing`;
 
-	gameRoomDiv.appendChild(newLobbyUser);
+	gameLobby.appendChild(newLobbyUser);
 });
 
 // eslint-disable-next-line no-unused-vars
