@@ -19,10 +19,9 @@ const indexRouter = require('./routes/index');
 const testsRouter = require('./routes/tests');
 const authRouter = require('./routes/auth');
 const gameRouter = require('./routes/game');
+const chatRouter = require('./routes/chat');
 
 const app = express();
-
-// app.socket = require('./sockets');
 
 // Session Store
 app.use(
@@ -62,6 +61,7 @@ app.use('/', indexRouter);
 app.use('/tests', testsRouter);
 app.use('/auth', authRouter);
 app.use('/game', gameRouter);
+app.use('/chat', chatRouter);
 
 // Catch 404 and forward to error handler
 app.use(function (req, res, next) {

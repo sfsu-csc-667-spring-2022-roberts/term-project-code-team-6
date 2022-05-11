@@ -51,9 +51,9 @@ io.on('connection', async function (socket) {
 	// 		socket.broadcast.to('room' + data.gameId).emit('turn change', data);
 	// });
 
-	socket.on('chat message', data => {
-		socket.broadcast.to(data.destination).emit('chat message', data);
-	});
+	// socket.on('chat message', data => {
+	// 	socket.broadcast.to(data.destination).emit('chat message', data);
+	// });
 
 	// socket.on('join room', data => {
 	// 	if (data.gameId) {

@@ -24,14 +24,27 @@ if (form) {
 			const body = await result.json();
 			// console.log(body);
 			const destination = gameId ? 'room' + gameId : 'lobby';
-			socket.emit('chat message', {
-				destination: destination,
-				username: body.username,
-				message: input.value,
-			});
 
-			createChatDiv(body.username, input.value);
-			messages.scrollTop = messages.scrollHeight;
+			await fetch('/chat', {
+				method: 'POST',
+				headers: {
+					Accept: 'application/json',
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					destination: destination,
+					username: body.username,
+					message: input.value,
+				}),
+			});
+			// socket.emit('chat message', {
+			// 	destination: destination,
+			// 	username: body.username,
+			// 	message: input.value,
+			// });
+
+			// createChatDiv(body.username, input.value);
+			// messages.scrollTop = messages.scrollHeight;
 			input.value = '';
 		}
 	});
