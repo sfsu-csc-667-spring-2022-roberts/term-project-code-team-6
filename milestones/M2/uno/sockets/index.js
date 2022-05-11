@@ -1,25 +1,25 @@
 const io = require('socket.io')();
-const { parseCookie } = require('../utils/parser');
-const { getSession } = require('../db/sessionDao');
-const { addSocket } = require('../utils/socketMap');
+// const { parseCookie } = require('../utils/parser');
+// const { getSession } = require('../db/sessionDao');
+// const { addSocket } = require('../utils/socketMap');
 const socketApi = {
 	io: io,
 };
 
 io.on('connection', async function (socket) {
 	console.log('A user connected');
-	const cookie = socket.handshake.headers.cookie;
-	const parsedCookie = parseCookie(cookie);
-	let userId;
-	if (parsedCookie.sid) {
-		// console.log(parsedCookie.sid);
-		const session = await getSession(parsedCookie.sid);
-		// console.log('session is: ', session);
-		if (session.userId) {
-			userId = session.userId;
-			addSocket(userId, socket);
-		}
-	}
+	// const cookie = socket.handshake.headers.cookie;
+	// const parsedCookie = parseCookie(cookie);
+	// let userId;
+	// if (parsedCookie.sid) {
+	// 	// console.log(parsedCookie.sid);
+	// 	const session = await getSession(parsedCookie.sid);
+	// 	// console.log('session is: ', session);
+	// 	if (session.userId) {
+	// 		userId = session.userId;
+	// 		addSocket(userId, socket);
+	// 	}
+	// }
 
 	let gameId;
 	if (socket.handshake.headers.referer.includes('/game/')) {
@@ -27,7 +27,7 @@ io.on('connection', async function (socket) {
 		gameId =
 			pathArray.length === 5 && pathArray[3] === 'game' ? pathArray[4] : null;
 	}
-	console.log('gameid: ', gameId);
+	// console.log('gameid: ', gameId);
 
 	socket.join('lobby');
 	if (gameId) socket.join('room' + gameId);
@@ -41,10 +41,10 @@ io.on('connection', async function (socket) {
 	// 		socket.broadcast.to('room' + data.gameId).emit('draw card', data);
 	// });
 
-	socket.on('play card', data => {
-		if (data.gameId)
-			socket.broadcast.to('room' + data.gameId).emit('play card', data);
-	});
+	// socket.on('play card', data => {
+	// 	if (data.gameId)
+	// 		socket.broadcast.to('room' + data.gameId).emit('play card', data);
+	// });
 
 	// socket.on('turn change', data => {
 	// 	if (data.gameId)

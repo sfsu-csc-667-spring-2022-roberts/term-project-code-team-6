@@ -448,21 +448,39 @@ router.post('/:id/play/:cardId', authUser, async (req, res, next) => {
 		console.log('current hand count: ', count);
 		console.log('next player is: ', userIdList[updatedPlayerTurn].user_id);
 
-		res.status(201).json({
-			message: `card ${cardId} is played`,
-			cardId: cardId,
-			rotate: rotate,
+		// if (!wildFlag || isGameFinished) {
+		socketApi.io.to('room' + gameId).emit('play card', {
+			id: cardId,
+			gameId: gameId,
 			color: fetchedCard.color,
 			value: fetchedCard.value,
+			rotate: rotate,
 			nextPlayerId: userIdList[updatedPlayerTurn].user_id,
 			playedBy: userId,
 			userIdList: userIdList,
-			youWin: count === '0',
-			yourTurn: userIdList[updatedPlayerTurn].user_id === userId,
-			username: username,
-			wildFlag: wildFlag,
-			userId: userId,
+			winner: isGameFinished ? username : null,
+			wildFlag,
+			isGameFinished,
 			neighbor: neighbor,
+		});
+		// }
+
+		res.status(201).json({
+			message: `card ${cardId} is played`,
+			// cardId: cardId,
+			// rotate: rotate,
+			// color: fetchedCard.color,
+			// value: fetchedCard.value,
+			// nextPlayerId: userIdList[updatedPlayerTurn].user_id,
+			// playedBy: userId,
+			// userIdList: userIdList,
+			// youWin: count === '0',
+			// yourTurn: userIdList[updatedPlayerTurn].user_id === userId,
+			// username: username,
+			// wildFlag,
+			// isGameFinished,
+			// userId: userId,
+			// neighbor: neighbor,
 		});
 	} catch (err) {
 		next(err);
@@ -590,10 +608,15 @@ router.post(
 			WHERE id = $3;';
 			await db.any(query, [updatedPlayerTurn, color, gameId]);
 
+			socketApi.io.to('room' + gameId).emit('update color', {
+				color,
+				nextPlayerId: userIdList[updatedPlayerTurn].user_id
+			});
+
 			res.status(201).json({
 				message: `color is updated to: ${color}`,
-				yourTurn: userIdList[updatedPlayerTurn].user_id === userId,
-				nextPlayerId: userIdList[updatedPlayerTurn].user_id,
+				// yourTurn: userIdList[updatedPlayerTurn].user_id === userId,
+				// nextPlayerId: userIdList[updatedPlayerTurn].user_id,
 			});
 		} catch (err) {
 			next(err);

@@ -121,6 +121,46 @@ function createYourWin(name) {
 	gameRoomDiv.appendChild(displayDiv);
 }
 
+function createColorPicker(body) {
+	const colorPopup = document.createElement('div');
+	colorPopup.className = 'color-popup';
+
+	const colorPicker = document.createElement('div');
+	colorPicker.className = 'color-picker';
+
+	const redPicker = document.createElement('div');
+	redPicker.addEventListener('click', () =>
+		onUpdateColor(body, 'red', colorPopup)
+	);
+	redPicker.className = 'redPicker';
+
+	const bluePicker = document.createElement('div');
+	bluePicker.addEventListener('click', () =>
+		onUpdateColor(body, 'blue', colorPopup)
+	);
+	bluePicker.className = 'bluePicker';
+
+	const greenPicker = document.createElement('div');
+	greenPicker.addEventListener('click', () =>
+		onUpdateColor(body, 'green', colorPopup)
+	);
+	greenPicker.className = 'greenPicker';
+
+	const yellowPicker = document.createElement('div');
+	yellowPicker.addEventListener('click', () =>
+		onUpdateColor(body, 'yellow', colorPopup)
+	);
+	yellowPicker.className = 'yellowPicker';
+
+	colorPicker.append(redPicker);
+	colorPicker.append(bluePicker);
+	colorPicker.append(greenPicker);
+	colorPicker.append(yellowPicker);
+
+	colorPopup.append(colorPicker);
+	gameRoomDiv.append(colorPopup);
+}
+
 async function onUpdateColor(body, color, popUpDiv) {
 	// console.log(color, ' is clicked');
 	const result = await fetch(
@@ -129,27 +169,27 @@ async function onUpdateColor(body, color, popUpDiv) {
 			method: 'POST',
 		}
 	);
-	const msg = await result.json();
+	await result.json();
 	// console.log(msg);
-	if (!msg.yourTurn) removeYourTurn();
+	// if (!msg.yourTurn) removeYourTurn();
 
-	updateRingColor(color);
+	// updateRingColor(color);
 
 	popUpDiv.remove();
-	body.nextPlayerId = msg.nextPlayerId;
-	socket.emit('play card', {
-		id: body.cardId,
-		gameId: gameId,
-		color: body.color,
-		selectedColor: color,
-		value: body.value,
-		rotate: body.rotate,
-		nextPlayerId: body.nextPlayerId,
-		playedBy: body.playedBy,
-		userIdList: body.userIdList,
-		winner: body.youWin ? body.username : null,
-		neighbor: body.neighbor,
-	});
+	// body.nextPlayerId = msg.nextPlayerId;
+	// socket.emit('play card', {
+	// 	id: body.cardId,
+	// 	gameId: gameId,
+	// 	color: body.color,
+	// 	selectedColor: color,
+	// 	value: body.value,
+	// 	rotate: body.rotate,
+	// 	nextPlayerId: body.nextPlayerId,
+	// 	playedBy: body.playedBy,
+	// 	userIdList: body.userIdList,
+	// 	winner: body.youWin ? body.username : null,
+	// 	neighbor: body.neighbor,
+	// });
 }
 
 async function onPlayCard(cardId) {
@@ -164,99 +204,99 @@ async function onPlayCard(cardId) {
 		return;
 	}
 
-	const card = document.getElementById(cardId);
-	createNewDiscardedCard(card.className, cardId, body.rotate);
+	// const card = document.getElementById(cardId);
+	// createNewDiscardedCard(card.className, cardId, body.rotate);
 
-	if (body.neighbor.drawCount) {
-		const userIndex = body.userIdList.findIndex(
-			uid => uid.user_id === body.userId
-		);
-		// console.log('user index is: ', userIndex);
+	// if (body.neighbor.drawCount) {
+	// 	const userIndex = body.userIdList.findIndex(
+	// 		uid => uid.user_id === body.userId
+	// 	);
+	// 	// console.log('user index is: ', userIndex);
 
-		const neighborIndex = body.userIdList.findIndex(
-			uid => uid.user_id === body.neighbor.id
-		);
+	// 	const neighborIndex = body.userIdList.findIndex(
+	// 		uid => uid.user_id === body.neighbor.id
+	// 	);
 
-		// console.log('neighborIndex index: ', neighborIndex);
+	// 	// console.log('neighborIndex index: ', neighborIndex);
 
-		addBackCards(
-			body.neighbor.drawCount,
-			neighborIndex,
-			userIndex,
-			body.userIdList.length
-		);
-	}
+	// 	addBackCards(
+	// 		body.neighbor.drawCount,
+	// 		neighborIndex,
+	// 		userIndex,
+	// 		body.userIdList.length
+	// 	);
+	// }
 
-	card.remove();
+	// card.remove();
 
-	if (!body.yourTurn) removeYourTurn();
+	// if (!body.yourTurn) removeYourTurn();
 
-	removeEndTurn();
+	// removeEndTurn();
 
-	if (body.youWin) {
-		// console.log('You win');
-		removeYourTurn();
-		createYourWin('You');
-		stopTheGame();
-	}
+	// if (body.youWin) {
+	// 	// console.log('You win');
+	// 	removeYourTurn();
+	// 	createYourWin('You');
+	// 	stopTheGame();
+	// }
 
-	if (!body.youWin && body.wildFlag) {
-		const colorPopup = document.createElement('div');
-		colorPopup.className = 'color-popup';
+	// if (!body.isGameFinished && body.wildFlag) {
+	// 	const colorPopup = document.createElement('div');
+	// 	colorPopup.className = 'color-popup';
 
-		const colorPicker = document.createElement('div');
-		colorPicker.className = 'color-picker';
+	// 	const colorPicker = document.createElement('div');
+	// 	colorPicker.className = 'color-picker';
 
-		const redPicker = document.createElement('div');
-		redPicker.addEventListener('click', () =>
-			onUpdateColor(body, 'red', colorPopup)
-		);
-		redPicker.className = 'redPicker';
+	// 	const redPicker = document.createElement('div');
+	// 	redPicker.addEventListener('click', () =>
+	// 		onUpdateColor(body, 'red', colorPopup)
+	// 	);
+	// 	redPicker.className = 'redPicker';
 
-		const bluePicker = document.createElement('div');
-		bluePicker.addEventListener('click', () =>
-			onUpdateColor(body, 'blue', colorPopup)
-		);
-		bluePicker.className = 'bluePicker';
+	// 	const bluePicker = document.createElement('div');
+	// 	bluePicker.addEventListener('click', () =>
+	// 		onUpdateColor(body, 'blue', colorPopup)
+	// 	);
+	// 	bluePicker.className = 'bluePicker';
 
-		const greenPicker = document.createElement('div');
-		greenPicker.addEventListener('click', () =>
-			onUpdateColor(body, 'green', colorPopup)
-		);
-		greenPicker.className = 'greenPicker';
+	// 	const greenPicker = document.createElement('div');
+	// 	greenPicker.addEventListener('click', () =>
+	// 		onUpdateColor(body, 'green', colorPopup)
+	// 	);
+	// 	greenPicker.className = 'greenPicker';
 
-		const yellowPicker = document.createElement('div');
-		yellowPicker.addEventListener('click', () =>
-			onUpdateColor(body, 'yellow', colorPopup)
-		);
-		yellowPicker.className = 'yellowPicker';
+	// 	const yellowPicker = document.createElement('div');
+	// 	yellowPicker.addEventListener('click', () =>
+	// 		onUpdateColor(body, 'yellow', colorPopup)
+	// 	);
+	// 	yellowPicker.className = 'yellowPicker';
 
-		colorPicker.append(redPicker);
-		colorPicker.append(bluePicker);
-		colorPicker.append(greenPicker);
-		colorPicker.append(yellowPicker);
+	// 	colorPicker.append(redPicker);
+	// 	colorPicker.append(bluePicker);
+	// 	colorPicker.append(greenPicker);
+	// 	colorPicker.append(yellowPicker);
 
-		colorPopup.append(colorPicker);
-		gameRoomDiv.append(colorPopup);
-	}
+	// 	colorPopup.append(colorPicker);
+	// 	gameRoomDiv.append(colorPopup);
+	// }
 
-	updateBoard();
+	// updateBoard();
 
-	if (!body.wildFlag || body.youWin) {
-		updateRingColor(body.color);
-		socket.emit('play card', {
-			id: body.cardId,
-			gameId: gameId,
-			color: body.color,
-			value: body.value,
-			rotate: body.rotate,
-			nextPlayerId: body.nextPlayerId,
-			playedBy: body.playedBy,
-			userIdList: body.userIdList,
-			winner: body.youWin ? body.username : null,
-			neighbor: body.neighbor,
-		});
-	}
+	// if (!body.wildFlag || body.youWin) {
+	// 	updateRingColor(body.color);
+	// 	socket.emit('play card', {
+	// 		id: body.cardId,
+	// 		gameId: gameId,
+	// 		color: body.color,
+	// 		value: body.value,
+	// 		rotate: body.rotate,
+	// 		nextPlayerId: body.nextPlayerId,
+	// 		playedBy: body.playedBy,
+	// 		userIdList: body.userIdList,
+	// 		winner: body.youWin ? body.username : null,
+	// 		neighbor: body.neighbor,
+	// 	});
+	// }
 }
 
 function addCardToHand(cards) {
@@ -424,24 +464,53 @@ socket.on('draw card', async data => {
 });
 
 socket.on('play card', async data => {
-	// console.log(data);
-	const className = `card ${data.color}-${data.value}`;
-	createNewDiscardedCard(className, data.id, data.rotate);
+	console.log(data);
 
 	const result = await fetch('/userInfo');
 	const body = await result.json();
-	// console.log(body);
+	console.log(body);
 
-	data.selectedColor
-		? updateRingColor(data.selectedColor)
-		: updateRingColor(data.color);
+	updateRingColor(data.color);
+	const className = `card ${data.color}-${data.value}`;
+	createNewDiscardedCard(className, data.id, data.rotate);
 
-	if (!data.winner && data.nextPlayerId === body.uid) {
-		createYourTurn();
-	}
-	// console.log(data.userIdList);
+	if (data.playedBy === body.uid) {
+		console.log('play by you');
+		if (data.neighbor.drawCount) {
+			const userIndex = data.userIdList.findIndex(
+				uid => uid.user_id === body.uid
+			);
+			// console.log('user index is: ', userIndex);
 
-	if (data.playedBy !== body.uid) {
+			const neighborIndex = data.userIdList.findIndex(
+				uid => uid.user_id === data.neighbor.id
+			);
+
+			// console.log('neighborIndex index: ', neighborIndex);
+
+			addBackCards(
+				data.neighbor.drawCount,
+				neighborIndex,
+				userIndex,
+				data.userIdList.length
+			);
+		}
+
+		const card = document.getElementById(data.id);
+		card.remove();
+
+		if (!data.isGameFinished && data.wildFlag) {
+			createColorPicker(data);
+		}
+
+		if (data.nextPlayerId !== body.uid) removeYourTurn();
+
+		removeEndTurn();
+	} else {
+		if (!data.isGameFinished && data.nextPlayerId === body.uid) {
+			createYourTurn();
+		}
+
 		const userIndex = data.userIdList.findIndex(
 			uid => uid.user_id === body.uid
 		);
@@ -503,14 +572,23 @@ socket.on('play card', async data => {
 		}
 	}
 
-	updateBoard();
+	// console.log(data.userIdList);
 
 	if (data.winner) {
-		// console.log(data.winner + ' is the winner');
-		createYourWin(data.winner);
-		//remove card listeners from user
+		// console.log('You win');
+		removeYourTurn();
+		createYourWin(data.winner === body.username ? 'You' : data.winner);
 		stopTheGame();
 	}
+
+	updateBoard();
+
+	// if (data.winner) {
+	// 	// console.log(data.winner + ' is the winner');
+	// 	createYourWin(data.winner);
+	// 	//remove card listeners from user
+	// 	stopTheGame();
+	// }
 });
 
 socket.on('turn change', async data => {
@@ -521,6 +599,17 @@ socket.on('turn change', async data => {
 	if (data.nextPlayerId === body.uid) {
 		createYourTurn();
 	}
+});
+
+socket.on('update color', async data => {
+	// console.log(data);
+	const result = await fetch('/userInfo');
+	const body = await result.json();
+	// console.log(body);
+	updateRingColor(data.color);
+	if (data.nextPlayerId === body.uid) {
+		createYourTurn();
+	} else removeYourTurn();
 });
 
 updateBoard();
