@@ -67,10 +67,13 @@ function removeYourTurn() {
 }
 
 function createYourTurn() {
-	const yourTurnElm = document.createElement('h1');
-	yourTurnElm.innerText = 'Your turn';
-	yourTurnElm.id = 'your-turn';
-	gameRoomDiv.appendChild(yourTurnElm);
+	const yourTurn = document.getElementById('your-turn');
+	if (!yourTurn) {
+		const yourTurnElm = document.createElement('h1');
+		yourTurnElm.innerText = 'Your turn';
+		yourTurnElm.id = 'your-turn';
+		gameRoomDiv.appendChild(yourTurnElm);
+	}
 }
 
 function removeEndTurn() {
@@ -505,7 +508,10 @@ socket.on('play card', async data => {
 			createColorPicker(data);
 		}
 
-		if (data.nextPlayerId !== body.uid) removeYourTurn();
+		if (data.nextPlayerId !== body.uid) {
+			console.log('remove');
+			removeYourTurn();
+		}
 
 		removeEndTurn();
 	} else {
