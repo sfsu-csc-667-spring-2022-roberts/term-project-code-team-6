@@ -103,7 +103,7 @@ router.post('/logout', (req, res, next) => {
 			next(err);
 		} else {
 			console.log('Session was destroyed.');
-			res.clearCookie('UNO Session');
+			res.clearCookie('unoSession');
 			res.json({ status: 'OK', message: 'user is logged out' });
 		}
 	});

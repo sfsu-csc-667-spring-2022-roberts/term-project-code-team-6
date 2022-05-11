@@ -33,7 +33,7 @@ app.use(
 		secret: 'thisisasigniture',
 		resave: false,
 		cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 }, // One Week
-		name: 'UNO Session',
+		name: 'unoSession',
 		saveUninitialized: false,
 	})
 );
