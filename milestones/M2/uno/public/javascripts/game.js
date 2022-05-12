@@ -14,6 +14,8 @@ const userCount = document.getElementById('user-count');
 const discardedDiv = document.getElementById('discarded-cards');
 const endTurnSpan = document.getElementById('end-turn');
 const gameLobby = document.getElementById('game-lobby');
+const toggleChat = document.querySelector('.chat');
+const toggleBtn = document.querySelector('.toggle');
 
 const playerCards = document.getElementsByClassName('hand');
 const p1 = document.getElementById('p1');
@@ -377,6 +379,13 @@ function stopTheGame() {
 function updateRingColor(color) {
 	// console.log('color is: ', color);
 	discardedDiv.className = `discarded-cards discarded-cards__${color}`;
+}
+
+if (toggleBtn) {
+	toggleBtn.addEventListener('click', () => {
+		toggleBtn.classList.toggle('active')
+		toggleChat.classList.toggle('active');
+	});
 }
 
 const startBtn = document.getElementById('start-game');

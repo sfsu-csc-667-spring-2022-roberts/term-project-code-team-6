@@ -5,7 +5,7 @@
 		<button id='start-game' class='secondary-btn'>Start</button>
 	{{/unless}}
 </div>
-<div id={{gameId}} class='game'>
+<div class='game'>
 	<div id='game-room' class='game-room'>
 		{{#if active}}
 			<div id='p1' class='hand player-one'>
@@ -59,5 +59,12 @@
 			</div>
 		{{/if}}
 	</div>
-	{{> chat}}
+		{{> chat}}
+		{{!-- {{> chat}}
+	<div class="game-chat"> 
+	</div>
+	<div class="toggle-chat">
+		{{> chat}}
+
+	</div> --}}
 </div>

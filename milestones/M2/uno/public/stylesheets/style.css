@@ -422,17 +422,84 @@ a {
 	font-size: 3rem;
 }
 
-
 .search-container {
 	display: flex;
 	align-items: center;
 }
 
-.search-container p{
+.search-container p {
 	margin-right: 1rem;
 }
 
 .search-container input {
 	height: 2rem;
 	font-size: 1.1rem;
+}
+
+.toggle {
+	display: none;
+	transition: all 0.3s;
+}
+
+.toggle-chat.active {
+	opacity: 1;
+	right: 0;
+}
+
+@media (max-width: 1000px) {
+	.chat {
+		position: absolute;
+		opacity: 0;
+		right: -500px;
+		z-index: 5;
+		background-color: white;
+		transition: all 0.3s;
+		border-radius: 0;
+	}
+
+	.chat.active {
+		opacity: 1;
+		right: 0;
+	}
+
+	.toggle {
+		position: absolute;
+		display: inline-block;
+		right: 10px;
+	}
+
+	.toggle.active {
+		right: 300px;
+	}
+
+	.content {
+		padding: 0.5rem;
+	}
+
+	.landing_game-room {
+		margin-right: 0;
+	}
+
+	.game-room {
+		margin-right: 0;
+	}
+
+	/* .toggle-chat {
+		display: block;
+		position: absolute;
+		width: 20rem;
+		z-index: 5;
+		background-color: white;
+		right: 0;
+	} */
+
+	/* .toggle-chat .chat {
+		border-radius: 0;
+	} */
+}
+
+@media (min-width: 1001px) {
+	.toggle-chat {
+		display: none;
+	}
 }
