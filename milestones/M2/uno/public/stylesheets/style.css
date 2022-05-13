@@ -134,9 +134,8 @@ a {
 }
 
 .chat {
-	flex: 1;
 	height: 70vh;
-	min-width: 300px;
+	width: 300px;
 	border: 1px solid gray;
 	border-radius: 3px;
 	display: flex;
@@ -145,7 +144,7 @@ a {
 
 .chat-msg {
 	flex: 1;
-	padding: 1rem;
+	padding: 1.3rem;
 	overflow-y: auto;
 	overflow-wrap: break-word;
 }
@@ -215,12 +214,10 @@ a {
 	background-color: white;
 	height: 21%;
 	width: 90%;
-	/* border-bottom: 1px solid black; */
 	margin-bottom: 1rem;
 	box-sizing: border-box;
 	align-items: center;
 	padding: 1rem;
-	z-index: 5;
 	border-radius: 8px;
 }
 
@@ -446,14 +443,18 @@ a {
 	right: 0;
 }
 
+.container {
+	position: relative;
+}
+
 @media (max-width: 1000px) {
 	.chat {
-		position: absolute;
+		position: fixed;
 		opacity: 0;
 		right: -500px;
-		z-index: 5;
+		/* z-index: 5; */
 		background-color: white;
-		transition: all 0.3s;
+		transition: all 0.5s;
 		border-radius: 0;
 	}
 
@@ -463,17 +464,27 @@ a {
 	}
 
 	.toggle {
-		position: absolute;
-		display: inline-block;
+		position: fixed;
+		display: flex;
 		right: 10px;
+		top: 50%;
+		background-color: #0072bc;
+		width: 40px;
+		height: 40px;
+		transform: rotate(180deg);
+		justify-content: center;
+		align-items: center;
+		border-radius: 50%;
+		transition: all 0.5s;
 	}
 
 	.toggle.active {
-		right: 300px;
+		right: 280px;
+		transform: rotate(0deg);
 	}
 
 	.content {
-		padding: 0.5rem;
+		padding: 2rem 0.5rem;
 	}
 
 	.landing_game-room {
@@ -484,18 +495,11 @@ a {
 		margin-right: 0;
 	}
 
-	/* .toggle-chat {
-		display: block;
-		position: absolute;
-		width: 20rem;
-		z-index: 5;
-		background-color: white;
-		right: 0;
-	} */
+	.search-container {
+		flex-direction: column;
+		align-items: flex-start;
+	}
 
-	/* .toggle-chat .chat {
-		border-radius: 0;
-	} */
 }
 
 @media (min-width: 1001px) {

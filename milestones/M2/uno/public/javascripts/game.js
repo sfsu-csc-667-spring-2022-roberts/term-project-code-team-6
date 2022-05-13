@@ -424,7 +424,7 @@ if (endTurnSpan) {
 
 socket.on('join game', data => {
 	// console.log(data);
-	console.log('join the game');
+	// console.log('join the game');
 	const newLobbyUser = document.createElement('div');
 	// const uid = document.createElement('p');
 	const username = document.createElement('p');
@@ -478,18 +478,18 @@ socket.on('draw card', async data => {
 });
 
 socket.on('play card', async data => {
-	console.log(data);
+	// console.log(data);
 
 	const result = await fetch('/userInfo');
 	const body = await result.json();
-	console.log(body);
+	// console.log(body);
 
 	updateRingColor(data.color);
 	const className = `card ${data.color}-${data.value}`;
 	createNewDiscardedCard(className, data.id, data.rotate);
 
 	if (data.playedBy === body.uid) {
-		console.log('play by you');
+		// console.log('play by you');
 		if (data.neighbor.drawCount) {
 			const userIndex = data.userIdList.findIndex(
 				uid => uid.user_id === body.uid
@@ -518,7 +518,7 @@ socket.on('play card', async data => {
 		}
 
 		if (data.nextPlayerId !== body.uid) {
-			console.log('remove');
+			// console.log('remove');
 			removeYourTurn();
 		}
 
